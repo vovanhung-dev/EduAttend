@@ -38,51 +38,11 @@ const DashBoard = () => {
                 const response = await userApi.getProfile();
                 console.log(response);
                 setUserData(response.user);
-
-                await userApi.getAllPosts().then((res) => {
-                    console.log(res);
-                    setTotalList(res)
-                    setLoading(false);
-                });
-
-                await userApi.getAllCampgrounds().then((res) => {
-                    console.log(res);
-                    setArea(res)
-                    setLoading(false);
-                });
-
-                await userApi.getAllServices().then((res) => {
-                    console.log(res);
-                    setService(res)
-                    setLoading(false);
-                });
-
                 await userApi.listUserByAdmin().then((res) => {
                     console.log(res);
                     setStatisticList(res.data);
                     setLoading(false);
                 });
-
-                if (response.user.role == "isAdmin") {
-
-                    await userApi.getStats().then((res) => {
-                        console.log(res);
-                        setTotalResult(res);
-                        setLoading(false);
-                    });
-                } else {
-                    await userApi.getStatsByUserId(response.user.id).then((res) => {
-                        console.log(res);
-                        setTotalResult(res);
-                        setLoading(false);
-                    });
-
-                    await userApi.getAllBookingsByUser(response.user.id).then((res) => {
-                        console.log(res);
-                        setBooking(res);
-                        setLoading(false);
-                    });
-                }
 
 
 
@@ -112,7 +72,7 @@ const DashBoard = () => {
                                 <Card className="card_total" bordered={false}>
                                     <div className='card_number'>
                                         <div>
-                                            <div className='number_total'>{statisticList?.length}</div>
+                                            <div className='number_total'>{statisticList?.length || 0}</div>
                                             <div className='title_total'>Số thành viên</div>
                                         </div>
                                         <div>
@@ -125,7 +85,7 @@ const DashBoard = () => {
                                 <Card className="card_total" bordered={false}>
                                     <div className='card_number'>
                                         <div>
-                                            <div className='number_total'>{total?.length}</div>
+                                            <div className='number_total'>{total?.length || 0}</div>
                                             <div className='title_total'>Tổng sinh viên</div>
                                         </div>
                                         <div>
@@ -139,7 +99,7 @@ const DashBoard = () => {
                                 <Card className="card_total" bordered={false}>
                                     <div className='card_number'>
                                         <div>
-                                            <div className='number_total'>{area?.length}</div>
+                                            <div className='number_total'>{area?.length || 0}</div>
                                             <div className='title_total'>Tổng số lớp</div>
                                         </div>
                                         <div>
@@ -154,7 +114,7 @@ const DashBoard = () => {
                                 <Card className="card_total" bordered={false}>
                                     <div className='card_number'>
                                         <div>
-                                            <div className='number_total'>{service?.length}</div>
+                                            <div className='number_total'>{service?.length || 0}</div>
                                             <div className='title_total'>Tổng lịch thi</div>
                                         </div>
                                         <div>

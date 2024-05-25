@@ -7,9 +7,6 @@
     box-shadow: 0 1px 15px rgb(0 0 0 / 4%), 0 1px 6px rgb(0 0 0 / 4%);
 }
 
-.container:hover{
-    background-color:#F5F5F5;
-}
 
 .fixLine{
     display: -webkit-box;
