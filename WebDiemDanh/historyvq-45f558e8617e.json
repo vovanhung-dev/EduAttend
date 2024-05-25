@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "historyvq",
+  "private_key_id": "45f558e8617eecd8103e6e987ff42bff5b3362fd",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCf49Ob0vL5xl/F\nFMJxNotIm6Lkx21Pm5svwvXiFyejJ97izdT9FzRnQRIt0+/+D1D3vGnO5T3Q6LnI\nb+cq2Fmx7CTCtHnrNUpIdrd5kyzwLqrWrb+tGEETTp6gjtwN1tKjxZ4dHtJ9xdnt\nwebAnRO7shI9qPdY8TZOTpVX/oP5Ww/IyU4Zc5QzV7soUqUy51ekBOSWiNTjBYYa\nWGnn2Y5VUnd4YMrlKFp3yoBlzT5m8S2WB8yF8JeI8DU/TAOA2D6ZeHkIGDt/ZBSo\nS90qd3TWNCw90XsziLRGUHTqlByzjawExRQSpWd4SFXXPdRwCNLlhDjZk4kcfibS\nFzZu13dtAgMBAAECggEAH1YDH7/C64V/uQwlxJL0Ts1j6jMUnxzH2B89WeuAUvdq\nNSiyhMzCsjbcVXt7Rl9hlsAIO6qNiC9IU/psg6blw1tc5AUDfP/TeGq98DeSP9th\nk5P3ZDkD7gEDUUPWaGbxHvRI1fu3tLstSC3vp9HRL4DJluiR245gvo2jstx4qIqq\n7/3NjkfJRBlKgPxYzGQJlioGDzDjHDbk0rmuTHjBItP31/NKBFj4OVFJ9Sg1Z+XY\nSXUm/eT5UkSzwsERBvDQdrL9D1h1yAxEuH2HoUp/n55GZCLP691lZ1ARQmnHpja9\nZxLkGG+QS7yAxLKb1vCpaHO0f/2WvKqi7Ueqx5/AcQKBgQDcZ3d6xF2CtF5Ga5zo\nEnzX62m8Z3sYfFGMAA5qYWRamNJ6aa8Zos2IfgiUHVL5Nr7cxJ9qDwuK7g2SQDPZ\n80xzRrmg70DJgwotATleu/QuWvf2fibuugkfHNmSPNRDTybmRe5WcCxD1GYVdFS7\nLwc2Kt84mm/rohzxmncb5fafEQKBgQC5tmuuIRqkQD7CZexFAxnDcqz2AMPGjdZx\nKy+BFtpCtTpe6Sa38DlVpQpFuZklszLa6h+fRzw0IOgRPcBQvMBFDViqzAWRegpq\nEQ0FOCSndXPEiCi2IIeTHWga6OJaiS54Qc9oYLt3HZeR0Nuf3hpqHeTn78/D9bxd\nqgSf/M1KnQKBgQC2KNmJ4MN8ZEBKqWRMNgNynUGNkmUdbpojQGSprYa4jfffbntm\nj7SZa7kBWV8bVBDY+7TZfkfG8krLJj70km4MFFcVWMhOA/ykB4/36RW+PjcURV0+\nDwm86iY0BAxW+RMoXIHIdPtQsDoS30usTQkDztkguhtoP1r2n/hzWVPEUQKBgQCi\nQsXQrbHmYw+ysHUAU1Y2U8LVahOkLxd3Z6Eo6/uln0yx0op22hhuQTY5d5FcxDah\n2T/p3ca3US0Sq16V7GUdsCyRhpMy6WuiAuXacpRsEA4nYEQZ5VAvdNkZ8fKb4hJN\nFksOyr3gtGVTDSZnhxqTLy1qjTh94f5D5CIIW0xPbQKBgEZiVyOw5EP/tVBtg89J\nBMu8S+U3nvSIhj1seepq1LNp1zcLendFmb/UN245Gmv90fMK/QY7Oq1SajE6YBia\nMkjzdYzt2lfaNhU4aPm523q3mvCI2n+vHqzB9lUKsRnd81oL1z3NSGK4wqR9GKtn\nNtu5AqWZ5WXt48wB6sZiPaQL\n-----END PRIVATE KEY-----\n",
+  "client_email": "attend-school@historyvq.iam.gserviceaccount.com",
+  "client_id": "116783076375894988550",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/attend-school%40historyvq.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
