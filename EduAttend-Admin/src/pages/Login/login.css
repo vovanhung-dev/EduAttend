@@ -56,18 +56,18 @@
     margin-bottom: 15px;
     margin-left: auto;
     margin-right: auto;
-    background-image: linear-gradient(to right, rgba(12,136,92,1), rgba(0,186,120,1));
+    background-image: linear-gradient(to bottom, rgba(15, 103, 165, 1), rgb(6, 42, 68));
     box-shadow: rgba(0, 0, 0, 0.15) 0px 10px 20px, rgba(0, 0, 0, 0.05) 0px 5px 10px;
 }
 
 .ant-btn-primary:hover {
-  background: linear-gradient(to right, rgba(12,136,92,1), rgba(0,186,120,1));
+  background-image: linear-gradient(to bottom, rgba(15, 103, 165, 1), rgb(6, 42, 68));
   background-position: 0 100%;
 }
 
 .ant-btn-primary:focus{
-  background: linear-gradient(to right, rgba(12,136,92,1), rgba(0,186,120,1));
-  border-color: linear-gradient(to right, rgba(12,136,92,1), rgba(0,186,120,1));
+  background-image: linear-gradient(to bottom, rgba(15, 103, 165, 1), rgb(6, 42, 68));
+  background-image: linear-gradient(to bottom, rgba(15, 103, 165, 1), rgb(6, 42, 68));
 }
 
 .ant-checkbox-checked .ant-checkbox-inner {
