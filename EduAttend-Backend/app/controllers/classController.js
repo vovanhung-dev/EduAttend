@@ -5,7 +5,7 @@ const classController = {
     // Hàm tạo class mới
     createClass: async (req, res) => {
         try {
-            const { name, description, slug, image } = req.body;
+            const { name, description, image } = req.body;
 
             const [checkClassExist] = await db.execute('SELECT * FROM class WHERE name = ?', [name]);
 
@@ -14,7 +14,7 @@ const classController = {
             }
 
             const createQuery = 'INSERT INTO class (name, description, image) VALUES (?, ?, ?)';
-            const values = [name, description, slug, image];
+            const values = [name, description, image];
 
             const [result] = await db.execute(createQuery, values);
 

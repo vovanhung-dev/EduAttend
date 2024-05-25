@@ -129,10 +129,9 @@ const ClassList = () => {
 
     const handleCategoryList = async () => {
         try {
-            await classApi.getListCategory({ page: 1, limit: 10000 }).then((res) => {
+            await classApi.getListClass({ page: 1, limit: 10000 }).then((res) => {
                 console.log(res);
-                setTotalList(res.totalDocs)
-                setCategory(res.categories);
+                setCategory(res.classes);
                 setLoading(false);
             });
         } catch (error) {
@@ -179,9 +178,8 @@ const ClassList = () => {
                 const response = await classApi.getDetailClass(id);
                 setId(id);
                 form2.setFieldsValue({
-                    name: response.category.name,
-                    description: response.category.description,
-                    parentCategoryId: response.category.parent,
+                    name: response.classInfo.name,
+                    description: response.classInfo.description,
 
                 });
                 console.log(form2);
@@ -195,8 +193,7 @@ const ClassList = () => {
     const handleFilter = async (name) => {
         try {
             const res = await classApi.searchClass(name);
-            setTotalList(res.totalDocs)
-            setCategory(res.data.docs);
+            setCategory(res.classes);
         } catch (error) {
             console.log('search to fetch category list:' + error);
         }
@@ -351,67 +348,69 @@ const ClassList = () => {
                     cancelText="Hủy"
                     width={600}
                 >
-                    <Form
-                        form={form}
-                        name="eventCreate"
-                        layout="vertical"
-                        initialValues={{
-                            residence: ['zhejiang', 'hangzhou', 'xihu'],
-                            prefix: '86',
-                        }}
-                        scrollToFirstError
-                    >
-
-                        <Form.Item
-                            name="name"
-                            label="Tên"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Vui lòng nhập tên!',
-                                },
-                            ]}
-                            style={{ marginBottom: 10 }}
+                    <Spin spinning={loading}>
+                        <Form
+                            form={form}
+                            name="eventCreate"
+                            layout="vertical"
+                            initialValues={{
+                                residence: ['zhejiang', 'hangzhou', 'xihu'],
+                                prefix: '86',
+                            }}
+                            scrollToFirstError
                         >
-                            <Input placeholder="Tên" />
-                        </Form.Item>
 
-                        <Form.Item
-                            name="description"
-                            label="Mô tả"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Vui lòng nhập mô tả!',
-                                },
-                            ]}
-                            style={{ marginBottom: 10 }}
-                        >
-                            <Input placeholder="Mô tả" />
-                        </Form.Item>
+                            <Form.Item
+                                name="name"
+                                label="Tên"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Vui lòng nhập tên!',
+                                    },
+                                ]}
+                                style={{ marginBottom: 10 }}
+                            >
+                                <Input placeholder="Tên" />
+                            </Form.Item>
 
-
-                        <Form.Item
-                            name="image"
-                            label="Chọn ảnh"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Vui lòng chọn ảnh!',
-                                },
-                            ]}
-                        >
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleChangeImage}
-                                id="avatar"
-                                name="file"
-                            />
-                        </Form.Item>
+                            <Form.Item
+                                name="description"
+                                label="Mô tả"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Vui lòng nhập mô tả!',
+                                    },
+                                ]}
+                                style={{ marginBottom: 10 }}
+                            >
+                                <Input placeholder="Mô tả" />
+                            </Form.Item>
 
 
-                    </Form>
+                            <Form.Item
+                                name="image"
+                                label="Chọn ảnh"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Vui lòng chọn ảnh!',
+                                    },
+                                ]}
+                            >
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleChangeImage}
+                                    id="avatar"
+                                    name="file"
+                                />
+                            </Form.Item>
+
+
+                        </Form>
+                    </Spin>
                 </Modal>
 
                 <Modal
@@ -434,56 +433,60 @@ const ClassList = () => {
                     cancelText="Hủy"
                     width={600}
                 >
-                    <Form
-                        form={form2}
-                        name="eventCreate"
-                        layout="vertical"
-                        initialValues={{
-                            residence: ['zhejiang', 'hangzhou', 'xihu'],
-                            prefix: '86',
-                        }}
-                        scrollToFirstError
-                    >
-                        <Form.Item
-                            name="name"
-                            label="Tên"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Please input your sender name!',
-                                },
-                            ]}
-                            style={{ marginBottom: 10 }}
-                        >
-                            <Input placeholder="Tên" />
-                        </Form.Item>
-                        <Form.Item
-                            name="description"
-                            label="Mô tả"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Please input your subject!',
-                                },
-                            ]}
-                            style={{ marginBottom: 10 }}
-                        >
-                            <Input placeholder="Mô tả" />
-                        </Form.Item>
+                    <Spin spinning={loading}>
 
-                        <Form.Item
-                            name="image"
-                            label="Chọn ảnh"
+                        <Form
+                            form={form2}
+                            name="eventCreate"
+                            layout="vertical"
+                            initialValues={{
+                                residence: ['zhejiang', 'hangzhou', 'xihu'],
+                                prefix: '86',
+                            }}
+                            scrollToFirstError
                         >
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleChangeImage}
-                                id="avatar"
-                                name="file"
-                            />
-                        </Form.Item>
-                    </Form>
+                            <Form.Item
+                                name="name"
+                                label="Tên"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Please input your sender name!',
+                                    },
+                                ]}
+                                style={{ marginBottom: 10 }}
+                            >
+                                <Input placeholder="Tên" />
+                            </Form.Item>
+                            <Form.Item
+                                name="description"
+                                label="Mô tả"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Please input your subject!',
+                                    },
+                                ]}
+                                style={{ marginBottom: 10 }}
+                            >
+                                <Input placeholder="Mô tả" />
+                            </Form.Item>
+
+                            <Form.Item
+                                name="image"
+                                label="Chọn ảnh"
+                            >
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleChangeImage}
+                                    id="avatar"
+                                    name="file"
+                                />
+                            </Form.Item>
+                        </Form>
+                    </Spin>
+
                 </Modal>
 
                 <BackTop style={{ textAlign: 'right' }} />

@@ -74,12 +74,12 @@ const AccountManagement = () => {
                         text === "isAdmin" ?
                             <Tag color="blue" key={text} style={{ width: 120, textAlign: "center" }} icon={<CopyOutlined />}>
                                 Quản lý
-                            </Tag> : text === "isPartner" ?
+                            </Tag> : text === "isStudent" ?
                                 <Tag color="green" key={text} style={{ width: 120, textAlign: "center" }} icon={<CheckCircleOutlined />}>
-                                    Đối tác
-                                </Tag> : text === "isClient" ?
+                                    Sinh viên
+                                </Tag> : text === "isTeacher" ?
                                     <Tag color="geekblue" key={text} style={{ width: 120, textAlign: "center" }} icon={<UserOutlined />}>
-                                        Khách hàng
+                                        Giảng viên
                                     </Tag> : null
                     }
                 </Space>
@@ -417,8 +417,8 @@ const AccountManagement = () => {
                         onChange={(value) => setSelectedRole(value)}
                     >
                         <Option value="isAdmin">Admin</Option>
-                        <Option value="isPartner">Đối tác</Option>
-                        <Option value="isClient">Khách hàng</Option>
+                        <Option value="isStudent">Sinh viên</Option>
+                        <Option value="isTeacher">Giảng viên</Option>
                     </Select>
                 </Modal>
                 <div id="account">
@@ -563,8 +563,8 @@ const AccountManagement = () => {
                         >
                             <Select placeholder="Chọn phân quyền">
                                 <Option value="isAdmin">Admin</Option>
-                                <Option value="isPartner">Đối tác</Option>
-                                <Option value="isClient">Khách hàng</Option>
+                                <Option value="isStudent">Sinh viên</Option>
+                                <Option value="isTeacher">Giảng viên</Option>
                             </Select>
                         </Form.Item>
 
