@@ -93,11 +93,11 @@ const authController = {
             );
     
             const transporter = nodemailer.createTransport({
-                host: 'mail49.vietnix.vn',
-                port: 465, 
+                host: 'smtp-relay.brevo.com',
+                port: '587',
                 auth: {
-                    user: 'admin@evertrip.io.vn',
-                    pass: 'evertrip052024',
+                    user: 'h5studiogl@gmail.com',
+                    pass: 'fScdnZ4WmEDqjBA1',
                 },
             });
     

@@ -90,7 +90,7 @@ const Login = () => {
         <div id="form-Login">
           <div className="formContentLeft"
           >
-            <img className="formImg" src="https://wallpapers.com/images/hd/camping-background-rgj5169zktuggn6e.jpg" alt='spaceship' />
+            <img className="formImg" src="https://img.freepik.com/free-photo/view-school-classroom_23-2151031888.jpg?size=626&ext=jpg&ga=GA1.1.1700460183.1712880000&semt=ais" alt='spaceship' />
           </div>
           <Form
             style={{ width: 340, marginBottom: 8 }}
