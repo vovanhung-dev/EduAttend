@@ -68,14 +68,14 @@ const ClassList = () => {
                     notification["error"]({
                         message: `Thông báo`,
                         description:
-                            'Tạo lớp thất bại',
+                            'Tạo môn học thất bại',
                     });
                 }
                 else {
                     notification["success"]({
                         message: `Thông báo`,
                         description:
-                            'Tạo lớp thành công',
+                            'Tạo môn học thành công',
                     });
                     setOpenModalCreate(false);
                     handleCategoryList();
@@ -99,14 +99,14 @@ const ClassList = () => {
                     notification["error"]({
                         message: `Thông báo`,
                         description:
-                            'Chỉnh sửa lớp thất bại',
+                            'Chỉnh sửa môn học thất bại',
                     });
                 }
                 else {
                     notification["success"]({
                         message: `Thông báo`,
                         description:
-                            'Chỉnh sửa lớp thành công',
+                            'Chỉnh sửa môn học thành công',
                     });
                     handleCategoryList();
                     setOpenModalUpdate(false);
@@ -147,7 +147,7 @@ const ClassList = () => {
                     notification["error"]({
                         message: `Thông báo`,
                         description:
-                            'Xóa lớp thất bại',
+                            'Xóa môn học thất bại',
 
                     });
                     setLoading(false);
@@ -156,7 +156,7 @@ const ClassList = () => {
                     notification["success"]({
                         message: `Thông báo`,
                         description:
-                            'Xóa lớp thành công',
+                            'Xóa môn học thành công',
 
                     });
                     setCurrentPage(1);
@@ -246,7 +246,7 @@ const ClassList = () => {
                         {"Chỉnh sửa"}
                     </Button>
                     <Popconfirm
-                        title="Bạn có chắc chắn xóa lớp này?"
+                        title="Bạn có chắc chắn xóa môn học này?"
                         onConfirm={() => handleDeleteCategory(record.id)}
                         okText="Yes"
                         cancelText="No"
@@ -290,7 +290,7 @@ const ClassList = () => {
                             </Breadcrumb.Item>
                             <Breadcrumb.Item href="">
                                 <ShoppingOutlined />
-                                <span>Quản lý lớp</span>
+                                <span>Quản lý môn học</span>
                             </Breadcrumb.Item>
                         </Breadcrumb>
                     </div>
@@ -313,7 +313,7 @@ const ClassList = () => {
                                     <Col span="6">
                                         <Row justify="end">
                                             <Space>
-                                                <Button onClick={showModal} icon={<PlusOutlined />} style={{ marginLeft: 10 }} >Tạo lớp</Button>
+                                                <Button onClick={showModal} icon={<PlusOutlined />} style={{ marginLeft: 10 }} >Tạo môn học</Button>
                                             </Space>
                                         </Row>
                                     </Col>
@@ -329,7 +329,7 @@ const ClassList = () => {
                 </div>
 
                 <Modal
-                    title="Tạo lớp mới"
+                    title="Tạo môn học mới"
                     visible={openModalCreate}
                     style={{ top: 100 }}
                     onOk={() => {
@@ -414,7 +414,7 @@ const ClassList = () => {
                 </Modal>
 
                 <Modal
-                    title="Chỉnh sửa lớp"
+                    title="Chỉnh sửa môn học"
                     visible={openModalUpdate}
                     style={{ top: 100 }}
                     onOk={() => {

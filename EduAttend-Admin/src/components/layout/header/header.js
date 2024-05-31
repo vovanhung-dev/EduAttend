@@ -60,10 +60,10 @@ function Topbar() {
   return (
     <div
       className="header"
-      style={{ background: "#0F67A5", padding: 0, margin: 0 }}
+      style={{ background: "#FFFFFF", padding: 0, margin: 0 }}
     >
       <div >
-        <Row className="header" style={{ background: "#0F67A5", top: 0, position: 'fixed', left: 0, display: 'flex', width: '100%', padding: 0, zIndex: 2, justifyContent: 'center', alignItems: 'center' }}>
+        <Row className="header" style={{ background: "#FFFFFF", top: 0, position: 'fixed', left: 0, display: 'flex', width: '100%', padding: 0, zIndex: 2, justifyContent: 'center', alignItems: 'center' }}>
           <Col span={10}>
             <div style={{ position: 'relative', display: 'flex', paddingTop: 3, paddingBottom: 3, alignItems: "center", marginLeft: 8 }}>
               <Row
@@ -71,7 +71,7 @@ function Topbar() {
               >
                 <Col style={{ paddingLeft: 10 }}>
                   <a href="#">
-                    <img style={{ height: 60 }} className="logo" alt="" src="https://www.sgu.edu.vn/wp-content/uploads/2016/10/logo_e_vs1_big.png" />
+                    <img style={{ height: 60 }} className="logo" alt="" src="https://www.stu.edu.vn/images/logo1.png" />
                   </a>
                 </Col>
               </Row>

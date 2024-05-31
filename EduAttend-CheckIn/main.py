@@ -9,8 +9,8 @@ from threading import Thread
 
 app = Flask(__name__)
 # Configuration for scope and authentication information
-credentials_file = "historyvq-45f558e8617e.json"
-spreadsheet_id = "14ObJI5f30n6p4jfntex_LF9UFQ3G37JzN8vghhU2KbI"
+credentials_file = "eduattend-3f61132a1d0b.json"
+spreadsheet_id = "1v7rLdvX9dO96-GlRRPTEuV4CCx12PoDioHkNzwzMl6Q"
 worksheet_name = "register_information"
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 credentials = ServiceAccountCredentials.from_json_keyfile_name(credentials_file, scope)
@@ -18,7 +18,7 @@ client = gspread.authorize(credentials)
 sheet = client.open_by_key(spreadsheet_id).worksheet(worksheet_name)
 
 drive_service = build('drive', 'v3', credentials=credentials)
-folder_id = '1j3njVQ3SkiXN0xOlftDcgMtbEQitIfjS'
+folder_id = '14WaWf2pcDiyhjZ76rXWBLwjnDzuDS1pV'
   
 def process_registration(name, mssv, email, phone_number, current_school_year, photo_data_urls):
     num_photos = len(photo_data_urls)

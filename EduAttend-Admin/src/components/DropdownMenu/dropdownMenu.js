@@ -69,7 +69,7 @@ function DropdownAvatar() {
               src={userData?.image}
             />
           </div>
-          <p style={{ padding: 0, margin: 0, textTransform: 'capitalize', color: "#FFFFFF" }} >
+          <p style={{ padding: 0, margin: 0, textTransform: 'capitalize', color: "#000000" }} >
             {userData?.username}
           </p>
         </div>
