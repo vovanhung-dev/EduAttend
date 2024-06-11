@@ -48,6 +48,17 @@ const createTables = async () => {
 
         console.log('Table "class" created or already exists.');
 
+          // Create the junction table "class_users" to manage the many-to-many relationship
+          await db.execute(`
+          CREATE TABLE IF NOT EXISTS class_users (
+              class_id INT NOT NULL,
+              user_id INT NOT NULL,
+              PRIMARY KEY (class_id, user_id),
+              FOREIGN KEY (class_id) REFERENCES class(id),
+              FOREIGN KEY (user_id) REFERENCES users(id)
+          )
+      `);
+
 
 
     } catch (error) {

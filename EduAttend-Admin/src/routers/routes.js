@@ -82,6 +82,14 @@ const ClassList = lazy(() => {
         .then(([moduleExports]) => moduleExports);
 });
 
+const ClassDetails = lazy(() => {
+    return Promise.all([
+        import('../pages/ClassDetails/classDetails'),
+        new Promise(resolve => setTimeout(resolve, 0))
+    ])
+        .then(([moduleExports]) => moduleExports);
+});
+
 
 
 
@@ -144,6 +152,13 @@ const RouterURL = withRouter(({ location }) => {
                             </Suspense>
                         </PrivateRoute>
 
+                        <PrivateRoute exact path="/details-class/:id">
+                            <Suspense fallback={<LoadingScreen />}>
+                                <ClassDetails />
+                            </Suspense>
+                        </PrivateRoute>
+
+                        
                         <PrivateRoute exact path="/notfound">
                             <NotFound />
                         </PrivateRoute>
@@ -181,8 +196,12 @@ const RouterURL = withRouter(({ location }) => {
                     <Route exact path="/class-list">
                         <DefaultContainer />
                     </Route>
-
+                   
                     <Route exact path="/dash-board">
+                        <DefaultContainer />
+                    </Route>
+
+                    <Route exact path="/details-class/:id">
                         <DefaultContainer />
                     </Route>
 

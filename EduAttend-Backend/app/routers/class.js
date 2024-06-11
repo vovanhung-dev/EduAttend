@@ -2,6 +2,8 @@ const classController = require("../controllers/classController");
 const router = require("express").Router();
 const middleware = require('../utils/middleware');
 
+router.get('/students/:id', classController.getStudentsByClassId);
+router.post('/addUser', middleware.checkLogin, classController.addUserToClass);
 router.get("/searchByName", classController.searchClassByName); 
 router.post('/search', classController.getAllClasses); 
 router.get('/:id', classController.getClassById); 

@@ -25,14 +25,14 @@ import {
     notification
 } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import axiosClient from '../../apis/axiosClient';
 import classApi from "../../apis/classApi";
-import "./classList.css";
+import "./classDetails.css";
 import uploadFileApi from '../../apis/uploadFileApi';
 const { Option } = Select;
 
-const ClassList = () => {
+const ClassDetails = () => {
 
     const [category, setCategory] = useState([]);
 
@@ -43,7 +43,7 @@ const ClassList = () => {
     const [form2] = Form.useForm();
     const [total, setTotalList] = useState();
     const [currentPage, setCurrentPage] = useState(1);
-    const [id, setId] = useState();
+    const { id } = useParams();
     const [image, setImage] = useState();
     const [file, setUploadFile] = useState();
 
@@ -82,38 +82,6 @@ const ClassList = () => {
                     handleCategoryList();
                 }
             })
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    const handleUpdateCategory = async (values) => {
-        setLoading(true);
-        try {
-            const categoryList = {
-                "name": values.name,
-                "description": values.description,
-                "image": file,
-            }
-            return axiosClient.put("/class/" + id, categoryList).then(response => {
-                if (response === undefined) {
-                    notification["error"]({
-                        message: `Thông báo`,
-                        description:
-                            'Chỉnh sửa môn học thất bại',
-                    });
-                }
-                else {
-                    notification["success"]({
-                        message: `Thông báo`,
-                        description:
-                            'Chỉnh sửa môn học thành công',
-                    });
-                    handleCategoryList();
-                    setOpenModalUpdate(false);
-                }
-            })
-
         } catch (error) {
             throw error;
         }
@@ -172,25 +140,6 @@ const ClassList = () => {
         }
     }
 
-    const handleEditCategory = (id) => {
-        setOpenModalUpdate(true);
-        (async () => {
-            try {
-                const response = await classApi.getDetailClass(id);
-                setId(id);
-                form2.setFieldsValue({
-                    name: response.classInfo.name,
-                    description: response.classInfo.description,
-
-                });
-                console.log(form2);
-                setLoading(false);
-            } catch (error) {
-                throw error;
-            }
-        })();
-    }
-
     const handleFilter = async (name) => {
         try {
             const res = await classApi.searchClass(name);
@@ -199,19 +148,6 @@ const ClassList = () => {
             console.log('search to fetch category list:' + error);
         }
     }
-
-    const handleChangeImage = async (e) => {
-        setLoading(true);
-        const response = await uploadFileApi.uploadFile(e);
-        if (response) {
-            setUploadFile(response);
-        }
-        setLoading(false);
-    }
-
-    const handleViewDetails = (id) => {
-        history.push(`/details-class/${id}`);
-    };
 
     const columns = [
         {
@@ -242,24 +178,8 @@ const ClassList = () => {
             key: 'action',
             render: (text, record) => (
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <Button
-                        size="small"
-                        icon={<EditOutlined />}
-                        style={{ width: 150, borderRadius: 15, height: 30, marginBottom: 10 }}
-                        onClick={() => handleEditCategory(record.id)}
-                    >
-                        {"Chỉnh sửa"}
-                    </Button>
-                    <Button
-                        size="small"
-                        icon={<EyeOutlined />}
-                        style={{ width: 150, borderRadius: 15, height: 30, marginBottom: 10 }}
-                        onClick={() => handleViewDetails(record.id)}
-                    >
-                        {"Xem chi tiết"}
-                    </Button>
                     <Popconfirm
-                        title="Bạn có chắc chắn xóa môn học này?"
+                        title="Bạn có chắc chắn xóa sinh viên này?"
                         onConfirm={() => handleDeleteCategory(record.id)}
                         okText="Yes"
                         cancelText="No"
@@ -281,7 +201,7 @@ const ClassList = () => {
     useEffect(() => {
         (async () => {
             try {
-                await classApi.getListClass({ page: 1, limit: 10000 }).then((res) => {
+                await classApi.getStudentsByClassId(id).then((res) => {
                     console.log(res);
                     setCategory(res.classes);
                     setLoading(false);
@@ -302,7 +222,7 @@ const ClassList = () => {
                             </Breadcrumb.Item>
                             <Breadcrumb.Item href="">
                                 <ShoppingOutlined />
-                                <span>Quản lý môn học</span>
+                                <span>Chi tiết danh sách sinh viên</span>
                             </Breadcrumb.Item>
                         </Breadcrumb>
                     </div>
@@ -325,7 +245,7 @@ const ClassList = () => {
                                     <Col span="6">
                                         <Row justify="end">
                                             <Space>
-                                                <Button onClick={showModal} icon={<PlusOutlined />} style={{ marginLeft: 10 }} >Tạo môn học</Button>
+                                                <Button onClick={showModal} icon={<PlusOutlined />} style={{ marginLeft: 10 }} >Thêm sinh viên vào môn học</Button>
                                             </Space>
                                         </Row>
                                     </Col>
@@ -341,7 +261,7 @@ const ClassList = () => {
                 </div>
 
                 <Modal
-                    title="Tạo môn học mới"
+                    title="Thêm sinh viên vào lớp học"
                     visible={openModalCreate}
                     style={{ top: 100 }}
                     onOk={() => {
@@ -372,134 +292,12 @@ const ClassList = () => {
                             scrollToFirstError
                         >
 
-                            <Form.Item
-                                name="name"
-                                label="Tên"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Vui lòng nhập tên!',
-                                    },
-                                ]}
-                                style={{ marginBottom: 10 }}
-                            >
-                                <Input placeholder="Tên" />
-                            </Form.Item>
-
-                            <Form.Item
-                                name="description"
-                                label="Mô tả"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Vui lòng nhập mô tả!',
-                                    },
-                                ]}
-                                style={{ marginBottom: 10 }}
-                            >
-                                <Input placeholder="Mô tả" />
-                            </Form.Item>
-
-
-                            <Form.Item
-                                name="image"
-                                label="Chọn ảnh"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Vui lòng chọn ảnh!',
-                                    },
-                                ]}
-                            >
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleChangeImage}
-                                    id="avatar"
-                                    name="file"
-                                />
-                            </Form.Item>
-
-
+                           
                         </Form>
                     </Spin>
                 </Modal>
 
-                <Modal
-                    title="Chỉnh sửa môn học"
-                    visible={openModalUpdate}
-                    style={{ top: 100 }}
-                    onOk={() => {
-                        form2
-                            .validateFields()
-                            .then((values) => {
-                                form2.resetFields();
-                                handleUpdateCategory(values);
-                            })
-                            .catch((info) => {
-                                console.log('Validate Failed:', info);
-                            });
-                    }}
-                    onCancel={handleCancel}
-                    okText="Hoàn thành"
-                    cancelText="Hủy"
-                    width={600}
-                >
-                    <Spin spinning={loading}>
-
-                        <Form
-                            form={form2}
-                            name="eventCreate"
-                            layout="vertical"
-                            initialValues={{
-                                residence: ['zhejiang', 'hangzhou', 'xihu'],
-                                prefix: '86',
-                            }}
-                            scrollToFirstError
-                        >
-                            <Form.Item
-                                name="name"
-                                label="Tên"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Please input your sender name!',
-                                    },
-                                ]}
-                                style={{ marginBottom: 10 }}
-                            >
-                                <Input placeholder="Tên" />
-                            </Form.Item>
-                            <Form.Item
-                                name="description"
-                                label="Mô tả"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Please input your subject!',
-                                    },
-                                ]}
-                                style={{ marginBottom: 10 }}
-                            >
-                                <Input placeholder="Mô tả" />
-                            </Form.Item>
-
-                            <Form.Item
-                                name="image"
-                                label="Chọn ảnh"
-                            >
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleChangeImage}
-                                    id="avatar"
-                                    name="file"
-                                />
-                            </Form.Item>
-                        </Form>
-                    </Spin>
-
-                </Modal>
+             
 
                 <BackTop style={{ textAlign: 'right' }} />
             </Spin>
@@ -507,4 +305,4 @@ const ClassList = () => {
     )
 }
 
-export default ClassList;
+export default ClassDetails;

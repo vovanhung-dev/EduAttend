@@ -132,6 +132,61 @@ const classController = {
             res.status(500).json({ message: 'Internal server error' });
         }
     },
+
+    addUserToClass: async (req, res) => {
+        try {
+            const { userId, classId } = req.body;
+
+            // Validate that the user exists and has the role 'isClient'
+            const [user] = await db.execute('SELECT * FROM users WHERE id = ? AND role = ?', [userId, 'isClient']);
+            
+            if (user.length === 0) {
+                return res.status(400).json({ message: 'User does not exist or does not have the role isClient' });
+            }
+
+            // Check if the class exists
+            const [classData] = await db.execute('SELECT * FROM class WHERE id = ?', [classId]);
+            if (classData.length === 0) {
+                return res.status(404).json({ message: 'Class not found' });
+            }
+
+            // Add the user to the class
+            const insertQuery = 'INSERT INTO class_users (class_id, user_id) VALUES (?, ?)';
+            await db.execute(insertQuery, [classId, userId]);
+
+            res.status(200).json({ message: 'User added to class successfully' });
+        } catch (error) {
+            console.error('Error adding user to class:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+     // Hàm lấy danh sách sinh viên theo ID của lớp
+     getStudentsByClassId: async (req, res) => {
+        try {
+            const classId = req.params.id;
+
+            // Kiểm tra xem lớp học có tồn tại hay không
+            const [classExists] = await db.execute('SELECT * FROM class WHERE id = ?', [classId]);
+            if (classExists.length === 0) {
+                return res.status(404).json({ message: 'Class not found' });
+            }
+
+            // Truy vấn danh sách sinh viên thuộc lớp
+            const query = `
+                SELECT users.id, users.username, users.email 
+                FROM users 
+                INNER JOIN class_users ON users.id = class_users.user_id
+                WHERE class_users.class_id = ?
+            `;
+            const [students] = await db.execute(query, [classId]);
+
+            res.status(200).json({ students });
+        } catch (error) {
+            console.error('Error getting students by class ID:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
 };
 
 module.exports = classController;
