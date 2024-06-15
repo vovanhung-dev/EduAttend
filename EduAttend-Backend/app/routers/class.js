@@ -4,6 +4,7 @@ const middleware = require('../utils/middleware');
 
 
 // Thêm các endpoint cho lịch thi
+router.get('/searchExamSchedules/searchByName', classController.searchExamSchedule);
 router.put('/updateExamSchedule/:id', middleware.checkLogin, classController.updateExamSchedule);
 router.post('/createExamSchedule', middleware.checkLogin, classController.createExamSchedule);
 router.get('/getAllExamSchedules', classController.getAllExamSchedules);

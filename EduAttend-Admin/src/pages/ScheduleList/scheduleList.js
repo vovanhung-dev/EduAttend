@@ -224,25 +224,14 @@ const ScheduleList = () => {
 
     const handleFilter = async (name) => {
         try {
-            const res = await classApi.searchClass(name);
-            setCategory(res.classes);
+            const res = await classApi.searchExamSchedule(name);
+            setCategory(res.schedules);
         } catch (error) {
             console.log('search to fetch category list:' + error);
         }
     }
 
-    const handleChangeImage = async (e) => {
-        setLoading(true);
-        const response = await uploadFileApi.uploadFile(e);
-        if (response) {
-            setUploadFile(response);
-        }
-        setLoading(false);
-    }
-
-    const handleViewDetails = (id) => {
-        history.push(`/details-class/${id}`);
-    };
+   
 
     const columns = [
         {

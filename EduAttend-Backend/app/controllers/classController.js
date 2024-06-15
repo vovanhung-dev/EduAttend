@@ -323,6 +323,45 @@ const classController = {
             res.status(500).json({ message: 'Internal server error' });
         }
     },
+    searchExamSchedule: async (req, res) => {
+        try {
+            const { name } = req.query;
+    
+            // Tìm kiếm theo tên (subject) trong bảng exam_schedule
+            const query = `
+                SELECT 
+                    es.id,
+                    es.subject,
+                    es.class_id,
+                    c.name AS className,
+                    es.teacher_id,
+                    u.username AS teacherName,
+                    es.exam_date,
+                    es.start_time,
+                    es.end_time,
+                    es.room,
+                    es.created_at,
+                    es.updated_at
+                FROM 
+                    exam_schedule es
+                LEFT JOIN 
+                    class c ON es.class_id = c.id
+                LEFT JOIN 
+                    users u ON es.teacher_id = u.id
+                WHERE 
+                    es.subject LIKE ?
+            `;
+    
+            // Sử dụng phần trăm (%) để tìm kiếm các đối tượng có chứa từ khóa trong tên (subject)
+            const [schedules] = await db.execute(query, [`%${name}%`]);
+    
+            // Trả về kết quả tìm kiếm
+            res.status(200).json({ schedules });
+        } catch (error) {
+            console.error('Error searching exam schedules:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
     
 
     updateExamSchedule: async (req, res) => {

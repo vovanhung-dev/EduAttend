@@ -78,7 +78,7 @@ const classApi = {
         const params = {
             name: name.target.value
         };
-        const url = '/class/examSchedule/searchByName';
+        const url = '/class/searchExamSchedules/searchByName';
         return axiosClient.get(url, { params });
     },
 
