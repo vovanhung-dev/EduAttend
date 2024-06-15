@@ -34,6 +34,7 @@ import "./scheduleList.css";
 import uploadFileApi from '../../apis/uploadFileApi';
 import userApi from '../../apis/userApi';
 import moment from "moment";
+import dayjs from 'dayjs';
 const { Option } = Select;
 
 const ScheduleList = () => {
@@ -107,7 +108,7 @@ const ScheduleList = () => {
                 endTime: values.endTime.format('HH:mm'),       
                 room: values.room
             };
-            return axiosClient.put("/class/updateExamSchedule" + id, examScheduleData).then(response => {
+            return axiosClient.put("/class/updateExamSchedule/" + id, examScheduleData).then(response => {
                 if (response === undefined) {
                     notification["error"]({
                         message: `Thông báo`,
@@ -201,11 +202,16 @@ const ScheduleList = () => {
         setOpenModalUpdate(true);
         (async () => {
             try {
-                const response = await classApi.getDetailClass(id);
+                const response = await classApi.getDetailExamSchedule(id);
                 setId(id);
                 form2.setFieldsValue({
-                    name: response.classInfo.name,
-                    description: response.classInfo.description,
+                    subject: response.scheduleInfo.subject,
+                    classId: response.scheduleInfo.class_id,
+                    teacherId: response.scheduleInfo.teacher_id,
+                    examDate: dayjs(response.scheduleInfo.examDate), 
+                    startTime: dayjs(response.scheduleInfo.startTime),    
+                    endTime: dayjs(response.scheduleInfo.endTime),       
+                    room: response.scheduleInfo.room
 
                 });
                 console.log(form2);

@@ -343,7 +343,7 @@ const classController = {
             }
     
             // Kiểm tra xem giáo viên có tồn tại và có vai trò là 'teacher' hay không
-            const [teacherExists] = await db.execute('SELECT * FROM users WHERE id = ? AND role = ?', [teacherId, 'teacher']);
+            const [teacherExists] = await db.execute('SELECT * FROM users WHERE id = ? AND role = ?', [teacherId, 'isTeacher']);
             if (teacherExists.length === 0) {
                 return res.status(404).json({ message: 'Teacher not found or is not a teacher' });
             }
