@@ -90,7 +90,13 @@ const ClassDetails = lazy(() => {
         .then(([moduleExports]) => moduleExports);
 });
 
-
+const ScheduleList = lazy(() => {
+    return Promise.all([
+        import('../pages/ScheduleList/scheduleList'),
+        new Promise(resolve => setTimeout(resolve, 0))
+    ])
+        .then(([moduleExports]) => moduleExports);
+});
 
 
 const RouterURL = withRouter(({ location }) => {
@@ -159,6 +165,13 @@ const RouterURL = withRouter(({ location }) => {
                         </PrivateRoute>
 
                         
+                        <PrivateRoute exact path="/schedule-list">
+                            <Suspense fallback={<LoadingScreen />}>
+                                <ScheduleList />
+                            </Suspense>
+                        </PrivateRoute>
+                        
+                        
                         <PrivateRoute exact path="/notfound">
                             <NotFound />
                         </PrivateRoute>
@@ -210,6 +223,10 @@ const RouterURL = withRouter(({ location }) => {
                     </Route>
         
                     <Route exact path="/dash-board">
+                        <DefaultContainer />
+                    </Route>
+
+                    <Route exact path="/schedule-list">
                         <DefaultContainer />
                     </Route>
 
