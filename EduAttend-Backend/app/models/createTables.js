@@ -59,6 +59,26 @@ const createTables = async () => {
           )
       `);
 
+       // Tạo bảng "exam_schedule" nếu chưa tồn tại
+       await db.execute(`
+    CREATE TABLE IF NOT EXISTS exam_schedule (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        subject VARCHAR(255) NOT NULL,
+        class_id INT NOT NULL,
+        teacher_id INT,
+        exam_date DATE,
+        start_time TIME,
+        end_time TIME,
+        room VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (class_id) REFERENCES class(id),
+        FOREIGN KEY (teacher_id) REFERENCES users(id)
+    )
+`);
+
+   console.log('Table "exam_schedule" created or already exists.');
+
 
 
     } catch (error) {

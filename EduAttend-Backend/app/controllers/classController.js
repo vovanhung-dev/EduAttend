@@ -209,6 +209,185 @@ const classController = {
             res.status(500).json({ message: 'Internal server error' });
         }
     },
+
+    createExamSchedule: async (req, res) => {
+        try {
+            const { subject, classId, teacherId, examDate, startTime, endTime, room } = req.body;
+    
+            // Kiểm tra xem lớp học có tồn tại hay không
+            const [classExists] = await db.execute('SELECT * FROM class WHERE id = ?', [classId]);
+            if (classExists.length === 0) {
+                return res.status(404).json({ message: 'Class not found' });
+            }
+    
+            // Kiểm tra xem giáo viên có tồn tại và có vai trò là 'teacher' hay không
+            const [teacherExists] = await db.execute('SELECT * FROM users WHERE id = ? AND role = ?', [teacherId, 'isTeacher']);
+            if (teacherExists.length === 0) {
+                return res.status(404).json({ message: 'Teacher not found or is not a teacher' });
+            }
+    
+            // Tạo lịch thi mới
+            const createQuery = `
+                INSERT INTO exam_schedule (subject, class_id, teacher_id, exam_date, start_time, end_time, room)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            `;
+            const values = [subject, classId, teacherId, examDate, startTime, endTime, room];
+    
+            const [result] = await db.execute(createQuery, values);
+    
+            res.status(201).json({ message: 'Exam schedule created successfully', examId: result.insertId });
+        } catch (error) {
+            console.error('Error creating exam schedule:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+    
+
+    getAllExamSchedules: async (req, res) => {
+        try {
+            // Query lấy thông tin từ bảng exam_schedule, class và users
+            const query = `
+                SELECT 
+                    es.id,
+                    es.subject,
+                    es.class_id,
+                    c.name AS className,
+                    es.teacher_id,
+                    u.username AS teacherName,
+                    es.exam_date,
+                    es.start_time,
+                    es.end_time,
+                    es.room,
+                    es.created_at,
+                    es.updated_at
+                FROM 
+                    exam_schedule es
+                LEFT JOIN 
+                    class c ON es.class_id = c.id
+                LEFT JOIN 
+                    users u ON es.teacher_id = u.id
+            `;
+    
+            // Thực thi query
+            const [schedules] = await db.execute(query);
+    
+            // Trả về kết quả
+            res.status(200).json({ schedules });
+        } catch (error) {
+            console.error('Error getting all exam schedules:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    getExamScheduleById: async (req, res) => {
+        try {
+            const examId = req.params.id;
+    
+            // Query lấy thông tin từ bảng exam_schedule, class và users cho một lịch thi cụ thể
+            const query = `
+                SELECT 
+                    es.id,
+                    es.subject,
+                    es.class_id,
+                    c.name AS className,
+                    es.teacher_id,
+                    u.username AS teacherName,
+                    es.exam_date,
+                    es.start_time,
+                    es.end_time,
+                    es.room,
+                    es.created_at,
+                    es.updated_at
+                FROM 
+                    exam_schedule es
+                LEFT JOIN 
+                    class c ON es.class_id = c.id
+                LEFT JOIN 
+                    users u ON es.teacher_id = u.id
+                WHERE 
+                    es.id = ?
+            `;
+    
+            // Thực thi query với examId
+            const [scheduleInfo] = await db.execute(query, [examId]);
+    
+            // Kiểm tra nếu không tìm thấy lịch thi
+            if (scheduleInfo.length === 0) {
+                return res.status(404).json({ message: 'Exam schedule not found' });
+            }
+    
+            // Trả về kết quả
+            res.status(200).json({ scheduleInfo: scheduleInfo[0] });
+        } catch (error) {
+            console.error('Error getting exam schedule by ID:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+    
+
+    updateExamSchedule: async (req, res) => {
+        try {
+            const examId = req.params.id;
+            const { subject, classId, teacherId, examDate, startTime, endTime, room } = req.body;
+    
+            // Kiểm tra xem lịch thi có tồn tại hay không
+            const [examExists] = await db.execute('SELECT * FROM exam_schedule WHERE id = ?', [examId]);
+            if (examExists.length === 0) {
+                return res.status(404).json({ message: 'Exam schedule not found' });
+            }
+    
+            // Kiểm tra xem lớp học có tồn tại hay không
+            const [classExists] = await db.execute('SELECT * FROM class WHERE id = ?', [classId]);
+            if (classExists.length === 0) {
+                return res.status(404).json({ message: 'Class not found' });
+            }
+    
+            // Kiểm tra xem giáo viên có tồn tại và có vai trò là 'teacher' hay không
+            const [teacherExists] = await db.execute('SELECT * FROM users WHERE id = ? AND role = ?', [teacherId, 'teacher']);
+            if (teacherExists.length === 0) {
+                return res.status(404).json({ message: 'Teacher not found or is not a teacher' });
+            }
+    
+            // Cập nhật lịch thi
+            const updateQuery = `
+                UPDATE exam_schedule
+                SET subject = ?, class_id = ?, teacher_id = ?, exam_date = ?, start_time = ?, end_time = ?, room = ?
+                WHERE id = ?
+            `;
+            const values = [subject, classId, teacherId, examDate, startTime, endTime, room, examId];
+    
+            const [result] = await db.execute(updateQuery, values);
+    
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ message: 'Exam schedule not found' });
+            }
+    
+            res.status(200).json({ message: 'Exam schedule updated successfully' });
+        } catch (error) {
+            console.error('Error updating exam schedule:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+    
+
+    deleteExamSchedule: async (req, res) => {
+        try {
+            const examId = req.params.id;
+
+            const deleteQuery = 'DELETE FROM exam_schedule WHERE id = ?';
+
+            const [result] = await db.execute(deleteQuery, [examId]);
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ message: 'Exam schedule not found' });
+            }
+
+            res.status(200).json({ message: 'Exam schedule deleted successfully' });
+        } catch (error) {
+            console.error('Error deleting exam schedule:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
 };
 
 module.exports = classController;

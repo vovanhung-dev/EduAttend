@@ -22,7 +22,9 @@ import {
     Table,
     Tag,
     Select,
-    notification
+    notification,
+    TimePicker,
+    DatePicker
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
@@ -30,6 +32,8 @@ import axiosClient from '../../apis/axiosClient';
 import classApi from "../../apis/classApi";
 import "./scheduleList.css";
 import uploadFileApi from '../../apis/uploadFileApi';
+import userApi from '../../apis/userApi';
+import moment from "moment";
 const { Option } = Select;
 
 const ScheduleList = () => {
@@ -59,12 +63,16 @@ const ScheduleList = () => {
 
             console.log(values);
 
-            const categoryList = {
-                "name": values.name,
-                "description": values.description,
-                "image": file,
-            }
-            return axiosClient.post("/class", categoryList).then(response => {
+            const examScheduleData = {
+                subject: values.subject,
+                classId: values.classId,
+                teacherId: values.teacherId,
+                examDate: values.examDate.format('YYYY-MM-DD'), 
+                startTime: values.startTime.format('HH:mm'),    
+                endTime: values.endTime.format('HH:mm'),       
+                room: values.room
+            };
+            return axiosClient.post("/class/createExamSchedule", examScheduleData).then(response => {
                 if (response === undefined) {
                     notification["error"]({
                         message: `Thông báo`,
@@ -90,12 +98,16 @@ const ScheduleList = () => {
     const handleUpdateCategory = async (values) => {
         setLoading(true);
         try {
-            const categoryList = {
-                "name": values.name,
-                "description": values.description,
-                "image": file,
-            }
-            return axiosClient.put("/class/" + id, categoryList).then(response => {
+            const examScheduleData = {
+                subject: values.subject,
+                classId: values.classId,
+                teacherId: values.teacherId,
+                examDate: values.examDate.format('YYYY-MM-DD'), 
+                startTime: values.startTime.format('HH:mm'),    
+                endTime: values.endTime.format('HH:mm'),       
+                room: values.room
+            };
+            return axiosClient.put("/class/updateExamSchedule" + id, examScheduleData).then(response => {
                 if (response === undefined) {
                     notification["error"]({
                         message: `Thông báo`,
@@ -130,10 +142,23 @@ const ScheduleList = () => {
 
     const handleCategoryList = async () => {
         try {
+            await classApi.getListExamSchedules({ page: 1, limit: 10000 }).then((res) => {
+                console.log(res);
+                setCategory(res.schedules);
+                setLoading(false);
+            });
+
             await classApi.getListClass({ page: 1, limit: 10000 }).then((res) => {
                 console.log(res);
-                setCategory(res.classes);
+                setClassList(res.classes);
                 setLoading(false);
+            });
+
+            await userApi.listUserByAdmin().then((res) => {
+                const teacherList = res.data.filter(user => user.role === 'isTeacher');
+                setTeacherList(teacherList);
+            }).catch((error) => {
+                console.error('Error fetching student list:', error);
             });
         } catch (error) {
             console.log('Failed to fetch event list:' + error);
@@ -143,7 +168,7 @@ const ScheduleList = () => {
     const handleDeleteCategory = async (id) => {
         setLoading(true);
         try {
-            await classApi.deleteClass(id).then(response => {
+            await classApi.deleteExamSchedule(id).then(response => {
                 if (response === undefined) {
                     notification["error"]({
                         message: `Thông báo`,
@@ -220,37 +245,63 @@ const ScheduleList = () => {
             render: (text, record, index) => index + 1,
         },
         {
-            title: 'Ảnh',
-            dataIndex: 'image',
-            key: 'image',
-            render: (image) => <img src={image} style={{ height: 60 }} />,
-            width: '10%'
+            title: 'Môn thi',
+            dataIndex: 'subject',
+            key: 'subject',
         },
         {
-            title: 'Tên',
-            dataIndex: 'name',
-            key: 'name',
-            render: (text) => <a>{text}</a>,
+            title: 'Lớp học',
+            dataIndex: 'class_id',
+            key: 'class_id',
+            render: (classId, record) => record.className, // Giả định rằng bạn có một cột tên lớp học
         },
         {
-            title: 'Mô tả',
-            dataIndex: 'description',
-            key: 'description',
+            title: 'Giáo viên',
+            dataIndex: 'teacher_id',
+            key: 'teacher_id',
+            render: (teacherId, record) => record.teacherName, // Giả định rằng bạn có một cột tên giáo viên
+        },
+        {
+            title: 'Ngày thi',
+            dataIndex: 'exam_date',
+            key: 'exam_date',
+            render: (date) => moment(date).format('YYYY-MM-DD'),
+        },
+        {
+            title: 'Thời gian bắt đầu',
+            dataIndex: 'start_time',
+            key: 'start_time',
+            render: (time) => moment(time, 'HH:mm:ss').format('HH:mm'),
+        },
+        {
+            title: 'Thời gian kết thúc',
+            dataIndex: 'end_time',
+            key: 'end_time',
+            render: (time) => moment(time, 'HH:mm:ss').format('HH:mm'),
+        },
+        {
+            title: 'Phòng thi',
+            dataIndex: 'room',
+            key: 'room',
+        },
+        {
+            title: 'Ngày tạo',
+            dataIndex: 'created_at',
+            key: 'created_at',
+            render: (date) => moment(date).format('YYYY-MM-DD HH:mm'),
+        },
+        {
+            title: 'Ngày cập nhật',
+            dataIndex: 'updated_at',
+            key: 'updated_at',
+            render: (date) => moment(date).format('YYYY-MM-DD HH:mm'),
         },
         {
             title: 'Action',
             key: 'action',
             render: (text, record) => (
-                
+
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                     <Button
-                        size="small"
-                        icon={<EyeOutlined />}
-                        style={{ width: 150, borderRadius: 15, height: 30, marginBottom: 10 }}
-                        onClick={() => handleViewDetails(record.id)}
-                    >
-                        {"Xem chi tiết"}
-                    </Button>
                     <Button
                         size="small"
                         icon={<EditOutlined />}
@@ -259,7 +310,7 @@ const ScheduleList = () => {
                     >
                         {"Chỉnh sửa"}
                     </Button>
-                   
+
                     <Popconfirm
                         title="Bạn có chắc chắn xóa lịch thi này?"
                         onConfirm={() => handleDeleteCategory(record.id)}
@@ -279,15 +330,31 @@ const ScheduleList = () => {
         }
     ];
 
+    const [teacherList, setTeacherList] = useState();
+    const [classList, setClassList] = useState();
 
     useEffect(() => {
         (async () => {
             try {
-                await classApi.getListClass({ page: 1, limit: 10000 }).then((res) => {
+                await classApi.getListExamSchedules({ page: 1, limit: 10000 }).then((res) => {
                     console.log(res);
-                    setCategory(res.classes);
+                    setCategory(res.schedules);
                     setLoading(false);
                 });
+
+                await classApi.getListClass({ page: 1, limit: 10000 }).then((res) => {
+                    console.log(res);
+                    setClassList(res.classes);
+                    setLoading(false);
+                });
+
+                await userApi.listUserByAdmin().then((res) => {
+                    const teacherList = res.data.filter(user => user.role === 'isTeacher');
+                    setTeacherList(teacherList);
+                }).catch((error) => {
+                    console.error('Error fetching student list:', error);
+                });
+
             } catch (error) {
                 console.log('Failed to fetch category list:' + error);
             }
@@ -375,51 +442,113 @@ const ScheduleList = () => {
                         >
 
                             <Form.Item
-                                name="name"
-                                label="Tên"
+                                name="subject"
+                                label="Môn thi"
                                 rules={[
                                     {
                                         required: true,
-                                        message: 'Vui lòng nhập tên!',
+                                        message: 'Vui lòng nhập môn thi!',
                                     },
                                 ]}
                                 style={{ marginBottom: 10 }}
                             >
-                                <Input placeholder="Tên" />
+                                <Input placeholder="Môn thi" />
                             </Form.Item>
 
                             <Form.Item
-                                name="description"
-                                label="Mô tả"
+                                name="classId"
+                                label="Lớp học"
                                 rules={[
                                     {
                                         required: true,
-                                        message: 'Vui lòng nhập mô tả!',
+                                        message: 'Vui lòng chọn lớp học!',
                                     },
                                 ]}
                                 style={{ marginBottom: 10 }}
                             >
-                                <Input placeholder="Mô tả" />
+                                <Select placeholder="Chọn lớp học">
+                                    {classList?.map((item) => (
+                                        <Option key={item.id} value={item.id}>
+                                            {item.name}
+                                        </Option>
+                                    ))}
+                                </Select>
                             </Form.Item>
 
-
                             <Form.Item
-                                name="image"
-                                label="Chọn ảnh"
+                                name="teacherId"
+                                label="Giáo viên"
                                 rules={[
                                     {
                                         required: true,
-                                        message: 'Vui lòng chọn ảnh!',
+                                        message: 'Vui lòng chọn giáo viên!',
                                     },
                                 ]}
+                                style={{ marginBottom: 10 }}
                             >
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleChangeImage}
-                                    id="avatar"
-                                    name="file"
-                                />
+                                <Select placeholder="Chọn giáo viên">
+                                    {teacherList?.map((item) => (
+                                        <Option key={item.id} value={item.id}>
+                                            {item.username}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+
+                            <Form.Item
+                                name="examDate"
+                                label="Ngày thi"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Vui lòng chọn ngày thi!',
+                                    },
+                                ]}
+                                style={{ marginBottom: 10 }}
+                            >
+                                <DatePicker format="YYYY-MM-DD" />
+                            </Form.Item>
+
+                            <Form.Item
+                                name="startTime"
+                                label="Thời gian bắt đầu"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Vui lòng chọn thời gian bắt đầu!',
+                                    },
+                                ]}
+                                style={{ marginBottom: 10 }}
+                            >
+                                <TimePicker format="HH:mm" />
+                            </Form.Item>
+
+                            <Form.Item
+                                name="endTime"
+                                label="Thời gian kết thúc"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Vui lòng chọn thời gian kết thúc!',
+                                    },
+                                ]}
+                                style={{ marginBottom: 10 }}
+                            >
+                                <TimePicker format="HH:mm" />
+                            </Form.Item>
+
+                            <Form.Item
+                                name="room"
+                                label="Phòng thi"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Vui lòng nhập phòng thi!',
+                                    },
+                                ]}
+                                style={{ marginBottom: 10 }}
+                            >
+                                <Input placeholder="Phòng thi" />
                             </Form.Item>
 
 
@@ -459,44 +588,114 @@ const ScheduleList = () => {
                             }}
                             scrollToFirstError
                         >
-                            <Form.Item
-                                name="name"
-                                label="Tên"
+                           <Form.Item
+                                name="subject"
+                                label="Môn thi"
                                 rules={[
                                     {
                                         required: true,
-                                        message: 'Please input your sender name!',
+                                        message: 'Vui lòng nhập môn thi!',
                                     },
                                 ]}
                                 style={{ marginBottom: 10 }}
                             >
-                                <Input placeholder="Tên" />
-                            </Form.Item>
-                            <Form.Item
-                                name="description"
-                                label="Mô tả"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Please input your subject!',
-                                    },
-                                ]}
-                                style={{ marginBottom: 10 }}
-                            >
-                                <Input placeholder="Mô tả" />
+                                <Input placeholder="Môn thi" />
                             </Form.Item>
 
                             <Form.Item
-                                name="image"
-                                label="Chọn ảnh"
+                                name="classId"
+                                label="Lớp học"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Vui lòng chọn lớp học!',
+                                    },
+                                ]}
+                                style={{ marginBottom: 10 }}
                             >
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleChangeImage}
-                                    id="avatar"
-                                    name="file"
-                                />
+                                <Select placeholder="Chọn lớp học">
+                                    {classList?.map((item) => (
+                                        <Option key={item.id} value={item.id}>
+                                            {item.name}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+
+                            <Form.Item
+                                name="teacherId"
+                                label="Giáo viên"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Vui lòng chọn giáo viên!',
+                                    },
+                                ]}
+                                style={{ marginBottom: 10 }}
+                            >
+                                <Select placeholder="Chọn giáo viên">
+                                    {teacherList?.map((item) => (
+                                        <Option key={item.id} value={item.id}>
+                                            {item.username}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+
+                            <Form.Item
+                                name="examDate"
+                                label="Ngày thi"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Vui lòng chọn ngày thi!',
+                                    },
+                                ]}
+                                style={{ marginBottom: 10 }}
+                            >
+                                <DatePicker format="YYYY-MM-DD" />
+                            </Form.Item>
+
+                            <Form.Item
+                                name="startTime"
+                                label="Thời gian bắt đầu"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Vui lòng chọn thời gian bắt đầu!',
+                                    },
+                                ]}
+                                style={{ marginBottom: 10 }}
+                            >
+                                <TimePicker format="HH:mm" />
+                            </Form.Item>
+
+                            <Form.Item
+                                name="endTime"
+                                label="Thời gian kết thúc"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Vui lòng chọn thời gian kết thúc!',
+                                    },
+                                ]}
+                                style={{ marginBottom: 10 }}
+                            >
+                                <TimePicker format="HH:mm" />
+                            </Form.Item>
+
+                            <Form.Item
+                                name="room"
+                                label="Phòng thi"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Vui lòng nhập phòng thi!',
+                                    },
+                                ]}
+                                style={{ marginBottom: 10 }}
+                            >
+                                <Input placeholder="Phòng thi" />
                             </Form.Item>
                         </Form>
                     </Spin>

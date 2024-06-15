@@ -47,6 +47,50 @@ const classApi = {
         const url = `/class/students/${id}`;
         return axiosClient.get(url);
     },
+
+    // Các API liên quan đến lịch thi
+    createExamSchedule(data) {
+        const url = '/class/createExamSchedule';
+        return axiosClient.post(url, data);
+    },
+
+    getDetailExamSchedule(id) {
+        const url = `/class/getExamScheduleById/${id}`;
+        return axiosClient.get(url);
+    },
+
+    getListExamSchedules() {
+        const url = '/class/getAllExamSchedules';
+        return axiosClient.get(url);
+    },
+
+    deleteExamSchedule(id) {
+        const url = `/class/deleteExamSchedule/${id}`;
+        return axiosClient.delete(url);
+    },
+
+    deleteUserFromExamSchedule(data) {
+        const url = '/class/examSchedule/removeUser';
+        return axiosClient.post(url, data);
+    },
+
+    searchExamSchedule(name) {
+        const params = {
+            name: name.target.value
+        };
+        const url = '/class/examSchedule/searchByName';
+        return axiosClient.get(url, { params });
+    },
+
+    addUserToExamSchedule(data) {
+        const url = '/class/examSchedule/addUser';
+        return axiosClient.post(url, data);
+    },
+
+    getStudentsByExamScheduleId(id) {
+        const url = `/class/examSchedule/students/${id}`;
+        return axiosClient.get(url);
+    },
 }
 
 export default classApi;

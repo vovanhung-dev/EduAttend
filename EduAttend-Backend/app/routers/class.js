@@ -2,6 +2,15 @@ const classController = require("../controllers/classController");
 const router = require("express").Router();
 const middleware = require('../utils/middleware');
 
+
+// Thêm các endpoint cho lịch thi
+router.post('/createExamSchedule', middleware.checkLogin, classController.createExamSchedule);
+router.get('/getAllExamSchedules', classController.getAllExamSchedules);
+router.get('/getExamScheduleById/:id', classController.getExamScheduleById);
+router.put('/updateExamSchedule/:id', middleware.checkLogin, classController.updateExamSchedule);
+router.delete('/deleteExamSchedule/:id', middleware.checkLogin, classController.deleteExamSchedule);
+
+
 router.get('/students/:id', classController.getStudentsByClassId);
 router.post('/addUser', middleware.checkLogin, classController.addUserToClass);
 router.get("/searchByName", classController.searchClassByName); 
