@@ -10,5 +10,6 @@ router.get('/:id', classController.getClassById);
 router.post('/', middleware.checkLogin, classController.createClass); 
 router.put('/:id', middleware.checkLogin, classController.updateClass);
 router.delete("/:id", middleware.checkLogin, classController.deleteClass);
+router.post('/removeUser', middleware.checkLogin, classController.removeUserFromClass);
 
 module.exports = router;

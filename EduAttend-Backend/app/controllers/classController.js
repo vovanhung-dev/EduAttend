@@ -187,6 +187,28 @@ const classController = {
             res.status(500).json({ message: 'Internal server error' });
         }
     },
+
+    removeUserFromClass: async (req, res) => {
+        try {
+            const { userId, classId } = req.body;
+
+            // Kiểm tra xem sinh viên có tồn tại trong lớp học hay không
+            const [userInClass] = await db.execute('SELECT * FROM class_users WHERE class_id = ? AND user_id = ?', [classId, userId]);
+
+            if (userInClass.length === 0) {
+                return res.status(404).json({ message: 'User is not enrolled in this class' });
+            }
+
+            // Xóa sinh viên khỏi lớp học
+            const deleteQuery = 'DELETE FROM class_users WHERE class_id = ? AND user_id = ?';
+            await db.execute(deleteQuery, [classId, userId]);
+
+            res.status(200).json({ message: 'User removed from class successfully' });
+        } catch (error) {
+            console.error('Error removing user from class:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
 };
 
 module.exports = classController;

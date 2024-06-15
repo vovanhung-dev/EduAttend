@@ -25,6 +25,11 @@ const classApi = {
         return axiosClient.delete(url);
     },
 
+    deleteUserClass(data) {
+        const url = "/class/removeUser";
+        return axiosClient.post(url, data);
+    },
+
     searchClass(name) {
         const params = {
             name: name.target.value

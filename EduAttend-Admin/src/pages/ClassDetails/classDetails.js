@@ -69,14 +69,14 @@ const ClassDetails = () => {
                     notification["error"]({
                         message: `Thông báo`,
                         description:
-                            'Tạo môn học thất bại',
+                            'Tạo sinh viên thất bại',
                     });
                 }
                 else {
                     notification["success"]({
                         message: `Thông báo`,
                         description:
-                            'Tạo môn học thành công',
+                            'Tạo sinh viên thành công',
                     });
                     setOpenModalCreate(false);
                     handleCategoryList();
@@ -98,9 +98,9 @@ const ClassDetails = () => {
 
     const handleCategoryList = async () => {
         try {
-            await classApi.getListClass({ page: 1, limit: 10000 }).then((res) => {
+            await classApi.getStudentsByClassId(id).then((res) => {
                 console.log(res);
-                setCategory(res.classes);
+                setCategory(res.students);
                 setLoading(false);
             });
         } catch (error) {
@@ -108,15 +108,20 @@ const ClassDetails = () => {
         };
     }
 
-    const handleDeleteCategory = async (id) => {
+    const handleDeleteCategory = async (userId) => {
         setLoading(true);
         try {
-            await classApi.deleteClass(id).then(response => {
+            const data = {
+                "classId": id,
+                "userId": userId,
+            }
+
+            await classApi.deleteUserClass(data).then(response => {
                 if (response === undefined) {
                     notification["error"]({
                         message: `Thông báo`,
                         description:
-                            'Xóa môn học thất bại',
+                            'Xóa sinh viên thất bại',
 
                     });
                     setLoading(false);
@@ -125,7 +130,7 @@ const ClassDetails = () => {
                     notification["success"]({
                         message: `Thông báo`,
                         description:
-                            'Xóa môn học thành công',
+                            'Xóa sinh viên thành công',
 
                     });
                     setCurrentPage(1);
@@ -258,7 +263,7 @@ const ClassDetails = () => {
                                     <Col span="6">
                                         <Row justify="end">
                                             <Space>
-                                                <Button onClick={showModal} icon={<PlusOutlined />} style={{ marginLeft: 10 }} >Thêm sinh viên vào môn học</Button>
+                                                <Button onClick={showModal} icon={<PlusOutlined />} style={{ marginLeft: 10 }} >Thêm sinh viên vào sinh viên</Button>
                                             </Space>
                                         </Row>
                                     </Col>
