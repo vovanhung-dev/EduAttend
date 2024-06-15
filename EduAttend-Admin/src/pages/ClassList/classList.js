@@ -241,7 +241,16 @@ const ClassList = () => {
             title: 'Action',
             key: 'action',
             render: (text, record) => (
+                
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
+                     <Button
+                        size="small"
+                        icon={<EyeOutlined />}
+                        style={{ width: 150, borderRadius: 15, height: 30, marginBottom: 10 }}
+                        onClick={() => handleViewDetails(record.id)}
+                    >
+                        {"Xem chi tiết"}
+                    </Button>
                     <Button
                         size="small"
                         icon={<EditOutlined />}
@@ -250,14 +259,7 @@ const ClassList = () => {
                     >
                         {"Chỉnh sửa"}
                     </Button>
-                    <Button
-                        size="small"
-                        icon={<EyeOutlined />}
-                        style={{ width: 150, borderRadius: 15, height: 30, marginBottom: 10 }}
-                        onClick={() => handleViewDetails(record.id)}
-                    >
-                        {"Xem chi tiết"}
-                    </Button>
+                   
                     <Popconfirm
                         title="Bạn có chắc chắn xóa môn học này?"
                         onConfirm={() => handleDeleteCategory(record.id)}

@@ -138,10 +138,10 @@ const classController = {
             const { userId, classId } = req.body;
 
             // Validate that the user exists and has the role 'isClient'
-            const [user] = await db.execute('SELECT * FROM users WHERE id = ? AND role = ?', [userId, 'isClient']);
+            const [user] = await db.execute('SELECT * FROM users WHERE id = ? AND role = ?', [userId, 'isStudent']);
             
             if (user.length === 0) {
-                return res.status(400).json({ message: 'User does not exist or does not have the role isClient' });
+                return res.status(400).json({ message: 'User does not exist or does not have the role isStudent' });
             }
 
             // Check if the class exists
@@ -174,7 +174,7 @@ const classController = {
 
             // Truy vấn danh sách sinh viên thuộc lớp
             const query = `
-                SELECT users.id, users.username, users.email 
+                SELECT users.id, users.username, users.email , users.image
                 FROM users 
                 INNER JOIN class_users ON users.id = class_users.user_id
                 WHERE class_users.class_id = ?

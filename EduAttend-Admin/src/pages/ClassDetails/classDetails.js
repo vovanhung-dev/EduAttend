@@ -28,6 +28,8 @@ import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import axiosClient from '../../apis/axiosClient';
 import classApi from "../../apis/classApi";
+import userApi from "../../apis/userApi";
+
 import "./classDetails.css";
 import uploadFileApi from '../../apis/uploadFileApi';
 const { Option } = Select;
@@ -41,10 +43,9 @@ const ClassDetails = () => {
     const [loading, setLoading] = useState(true);
     const [form] = Form.useForm();
     const [form2] = Form.useForm();
-    const [total, setTotalList] = useState();
+    const [studentList, setStudentList] = useState();
     const [currentPage, setCurrentPage] = useState(1);
     const { id } = useParams();
-    const [image, setImage] = useState();
     const [file, setUploadFile] = useState();
 
     const history = useHistory();
@@ -60,11 +61,10 @@ const ClassDetails = () => {
             console.log(values);
 
             const categoryList = {
-                "name": values.name,
-                "description": values.description,
-                "image": file,
+                "classId": id,
+                "userId": values.students,
             }
-            return axiosClient.post("/class", categoryList).then(response => {
+            return axiosClient.post("/class/addUser", categoryList).then(response => {
                 if (response === undefined) {
                     notification["error"]({
                         message: `Thông báo`,
@@ -156,6 +156,12 @@ const ClassDetails = () => {
             render: (text, record, index) => index + 1,
         },
         {
+            title: 'Mã số sinh viên',
+            dataIndex: 'id',
+            key: 'id',
+            render: (text) => <a>SV000{text}</a>,
+        },
+        {
             title: 'Ảnh',
             dataIndex: 'image',
             key: 'image',
@@ -164,14 +170,14 @@ const ClassDetails = () => {
         },
         {
             title: 'Tên',
-            dataIndex: 'name',
-            key: 'name',
+            dataIndex: 'username',
+            key: 'username',
             render: (text) => <a>{text}</a>,
         },
         {
             title: 'Mô tả',
-            dataIndex: 'description',
-            key: 'description',
+            dataIndex: 'email',
+            key: 'email',
         },
         {
             title: 'Action',
@@ -203,8 +209,15 @@ const ClassDetails = () => {
             try {
                 await classApi.getStudentsByClassId(id).then((res) => {
                     console.log(res);
-                    setCategory(res.classes);
+                    setCategory(res.students);
                     setLoading(false);
+                });
+
+                await userApi.listUserByAdmin().then((res) => {
+                    const studentList = res.data.filter(user => user.role === 'isStudent');
+                    setStudentList(studentList);
+                }).catch((error) => {
+                    console.error('Error fetching student list:', error);
                 });
             } catch (error) {
                 console.log('Failed to fetch category list:' + error);
@@ -235,12 +248,12 @@ const ClassDetails = () => {
                             >
                                 <Row>
                                     <Col span="18">
-                                        <Input
+                                        {/* <Input
                                             placeholder="Tìm kiếm"
                                             allowClear
                                             onChange={handleFilter}
                                             style={{ width: 300 }}
-                                        />
+                                        /> */}
                                     </Col>
                                     <Col span="6">
                                         <Row justify="end">
@@ -292,12 +305,32 @@ const ClassDetails = () => {
                             scrollToFirstError
                         >
 
-                           
+                            <Form.Item
+                                name="students"
+                                label="Tiện ích"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Vui lòng chọn sinh viên!',
+                                    },
+                                ]}
+                                style={{ marginBottom: 10 }}
+                            >
+                                <Select
+                                    placeholder="Chọn sinh viên"
+                                >
+                                    {studentList?.map((item) => (
+                                        <Option key={item.id} value={item.id}>
+                                            {item.username}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
                         </Form>
                     </Spin>
                 </Modal>
 
-             
+
 
                 <BackTop style={{ textAlign: 'right' }} />
             </Spin>
