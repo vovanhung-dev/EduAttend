@@ -60,10 +60,19 @@ def compare_faces():
                 print(response)
 
                 if len(response['FaceMatches']) > 0:
-                    return jsonify({'match': True, 'target_image': target_image_name})
+                    matched_image_url = s3_client.generate_presigned_url(
+                        ClientMethod='get_object',
+                        Params={
+                            'Bucket': bucket_name,
+                            'Key': target_image_name
+                        },
+                        ExpiresIn=3600  # Thời gian URL được phép tồn tại (tính bằng giây)
+                    )
+
+                    return jsonify({'match': True, 'target_image': matched_image_url})
 
         return jsonify({'match': False})
-    
+
     except Exception as e:
         return jsonify({'error': str(e)})
 

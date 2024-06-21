@@ -212,9 +212,9 @@
         </section>
 
         <section class="text-gray-400 bg-gray-900 body-font">
-            <div id="result"></div>
+    <div id="result" class="flex items-center justify-center h-96"></div>
+</section>
 
-        </section>
 
         <footer class="text-gray-400 bg-gray-900 body-font">
             <div
@@ -280,12 +280,30 @@
             })
             .then(response => response.json())
             .then(data => {
-                if (data.match) {
-                    document.getElementById('result').innerText = 'Match found with ' + data.target_image;
-                } else {
-                    document.getElementById('result').innerText = 'No match found';
-                }
-            })
+    if (data.match) {
+        // Tạo một thẻ <img> mới
+        let imgElement = document.createElement('img');
+        // Thiết lập thuộc tính src của thẻ <img> để hiển thị ảnh từ URL
+        imgElement.src = data.target_image;
+        // Xóa nội dung cũ của div 'result'
+        document.getElementById('result').innerHTML = '';
+        // Thêm thẻ <img> vào trong div 'result'
+        document.getElementById('result').appendChild(imgElement);
+        // Áp dụng các lớp CSS từ Tailwind cho thẻ <img> để set kích thước cứng
+        imgElement.classList.add('h-96', 'w-96', 'object-cover', 'rounded-lg', 'shadow-md');
+
+        // Tạo thẻ <p> để hiển thị thông báo đã điểm danh thành công
+        let successText = document.createElement('div');
+        successText.innerText = 'Đã điểm danh thành công và người được điểm danh là ' + data.target_image;
+        successText.classList.add('text-xl', 'text-white', 'p-8');
+        document.getElementById('result').appendChild(successText);
+    } else {
+        // Nếu không có sự trùng khớp, hiển thị thông báo văn bản
+        document.getElementById('result').innerText = 'No match found';
+        // Áp dụng các lớp CSS từ Tailwind cho thông báo văn bản
+        document.getElementById('result').classList.add('text-xl', 'text-white', 'p-8');
+    }
+})
             .catch(error => {
                 console.error('Error:', error);
                 document.getElementById('result').innerText = 'Error: ' + error.message;
