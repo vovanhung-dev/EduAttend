@@ -65,6 +65,7 @@ const ClassList = () => {
                 "image": file,
             }
             return axiosClient.post("/class", categoryList).then(response => {
+              
                 if (response === undefined) {
                     notification["error"]({
                         message: `Thông báo`,

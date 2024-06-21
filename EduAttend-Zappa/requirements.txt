@@ -1,0 +1,4 @@
+werkzeug
+flask
+boto3
+requests

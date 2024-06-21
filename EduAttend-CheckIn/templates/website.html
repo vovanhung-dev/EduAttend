@@ -144,28 +144,24 @@
 
         <section class="text-gray-400 bg-gray-900 body-font">
             <form action="/" method="POST" class="max-w-6xl mx-auto p-8">
-                <h1 class="text-3xl mb-4 text-white title-font">Điểm danh ngay</h1>
                 <div class="my-4">
-                    <input type="text" placeholder="Họ và tên sinh viên" id="name" name="name" required
-                        class="w-full px-4 py-2 rounded-md bg-gray-800 text-white outline-none focus:bg-gray-700" />
+                    <h1 class="text-3xl mb-4 text-center text-white font-bold">Chọn Lịch Thi</h1>
+
+                <div class="my-4">
+                    <select id="examScheduleDropdown" class="w-full px-4 py-2 rounded-md bg-gray-700 text-white border border-gray-600 focus:outline-none focus:bg-gray-600">
+                        <option value="">Chọn một lịch thi</option>
+                    </select>
                 </div>
-                <div class="my-4">
-                    <input type="text" placeholder="Mã số sinh viên" id="mssv" name="mssv" required
-                        class="w-full px-4 py-2 rounded-md bg-gray-800 text-white outline-none focus:bg-gray-700" />
-                </div>
-                <div class="my-4">
-                    <input type="email" placeholder="Email" id="email" name="email" required
-                        class="w-full px-4 py-2 rounded-md bg-gray-800 text-white outline-none focus:bg-gray-700" />
-                </div>
-                <div class="my-4">
-                    <input type="text" placeholder="Số điện thoại" id="phone_number" name="phone_number"
-                        required
-                        class="w-full px-4 py-2 rounded-md bg-gray-800 text-white outline-none focus:bg-gray-700" />
-                </div>
-                <div class="my-4">
-                    <input type="text" placeholder="Sinh viên khóa" id="current_school_year"
-                        name="current_school_year" required
-                        class="w-full px-4 py-2 rounded-md bg-gray-800 text-white outline-none focus:bg-gray-700" />
+
+                <div id="examScheduleDetails" class="my-4 hidden p-4 bg-gray-700 rounded-lg shadow-md">
+                    <h2 class="text-xl mb-2 text-center font-semibold">Chi Tiết Lịch Thi</h2>
+                    <p class="mb-2"><span class="font-bold">Môn Học:</span> <span id="examSubject" class="ml-2 text-gray-300"></span></p>
+                    <p class="mb-2"><span class="font-bold">Lớp:</span> <span id="className" class="ml-2 text-gray-300"></span></p>
+                    <p class="mb-2"><span class="font-bold">Tên Giáo Viên:</span> <span id="teacherName" class="ml-2 text-gray-300"></span></p>
+                    <p class="mb-2"><span class="font-bold">Ngày Thi:</span> <span id="examDate" class="ml-2 text-gray-300"></span></p>
+                    <p class="mb-2"><span class="font-bold">Giờ Bắt Đầu:</span> <span id="startTime" class="ml-2 text-gray-300"></span></p>
+                    <p class="mb-2"><span class="font-bold">Giờ Kết Thúc:</span> <span id="endTime" class="ml-2 text-gray-300"></span></p>
+                    <p class="mb-2"><span class="font-bold">Phòng Thi:</span> <span id="room" class="ml-2 text-gray-300"></span></p>
                 </div>
             </br>
                 <div class="grid grid-cols-2 gap-5">
@@ -249,64 +245,119 @@
             </div>
         </footer>
 
-<script>
-  const video = document.getElementById("camera-preview");
-  const photoContainer = document.getElementById("photo-container");
-  let photoDataUrls = [];
-  let isCapturing = false;
-  let captureInterval;
-  const maxPhotos = 10; // Set the maximum number of photos
-  navigator.mediaDevices.getUserMedia({ video: true })
-      .then((stream) => {
-          video.srcObject = stream;
-      })
-      .catch((error) => {
-          console.error("Failed to access the camera:", error);
-      });
-  function startCapture() {
-      if (!isCapturing) {
-          isCapturing = true;
-          captureInterval = setInterval(() => {
-              if (photoDataUrls.length < maxPhotos) {
-                  capturePhoto();
-              } else {
-                  stopCapture();
-              }
-          }, 10);
-      }
-  }
-  function stopCapture() {
-      if (isCapturing) {
-          isCapturing = false;
-          clearInterval(captureInterval);
-          checkAndSubmitForm();
-      }
-  }
-  function capturePhoto() {
-      const canvas = document.createElement("canvas");
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
-      const photoDataUrl = canvas.toDataURL("image/png");
-      photoDataUrls.push(photoDataUrl);
-      const image = document.createElement("img");
-      image.src = photoDataUrl;
-      photoContainer.appendChild(image);
-      const photoInput = document.createElement("input");
-      photoInput.type = "hidden";
-      photoInput.name = "photo";
-      photoInput.value = photoDataUrl;
-      photoContainer.appendChild(photoInput);
-  }
-  function showSuccessMessage() {
-    alert("Đăng ký thành công");
-}
-  function checkAndSubmitForm() {
-      if (photoDataUrls.length === maxPhotos) {
-          document.querySelector('form').submit();
-          showSuccessMessage();
-      }
-  }
-</script>
+        <script>
+        // Exam Schedule Dropdown and Display Script
+        document.addEventListener('DOMContentLoaded', () => {
+            const dropdown = document.getElementById('examScheduleDropdown');
+            const detailsSection = document.getElementById('examScheduleDetails');
+
+            // Fetch exam schedules
+            fetch('http://localhost:3100/api/class/getAllExamSchedules')
+                .then(response => response.json())
+                .then(data => {
+                    const schedules = data.schedules;
+                    schedules.forEach(schedule => {
+                        const option = document.createElement('option');
+                        option.value = schedule.id;
+                        option.textContent = `${schedule.subject} - ${schedule.className} - ${schedule.exam_date}`;
+                        option.dataset.details = JSON.stringify(schedule);
+                        dropdown.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching exam schedules:', error));
+
+            // Event listener for dropdown selection
+            dropdown.addEventListener('change', (event) => {
+                const selectedOption = event.target.options[event.target.selectedIndex];
+                if (selectedOption.value) {
+                    const scheduleDetails = JSON.parse(selectedOption.dataset.details);
+                    document.getElementById('examSubject').textContent = scheduleDetails.subject;
+                    document.getElementById('className').textContent = scheduleDetails.className;
+                    document.getElementById('teacherName').textContent = scheduleDetails.teacherName;
+                    document.getElementById('examDate').textContent = scheduleDetails.exam_date;
+                    document.getElementById('startTime').textContent = scheduleDetails.start_time;
+                    document.getElementById('endTime').textContent = scheduleDetails.end_time;
+                    document.getElementById('room').textContent = scheduleDetails.room;
+
+                    detailsSection.classList.remove('hidden');
+                } else {
+                    detailsSection.classList.add('hidden');
+                }
+            });
+        });
+
+        // Camera Photo Capture Script
+        const video = document.getElementById("camera-preview");
+        const photoContainer = document.getElementById("photo-container");
+        const photoHiddenInputs = document.getElementById("photo-hidden-inputs");
+        let photoDataUrls = [];
+        let isCapturing = false;
+        let captureInterval;
+        const maxPhotos = 10;
+
+        // Access camera
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                video.srcObject = stream;
+            })
+            .catch((error) => {
+                console.error("Failed to access the camera:", error);
+            });
+
+        function startCapture() {
+            if (!isCapturing) {
+                isCapturing = true;
+                captureInterval = setInterval(() => {
+                    if (photoDataUrls.length < maxPhotos) {
+                        capturePhoto();
+                    } else {
+                        stopCapture();
+                    }
+                }, 1000); // Capture every 1 second for better interval
+            }
+        }
+
+        function stopCapture() {
+            if (isCapturing) {
+                isCapturing = false;
+                clearInterval(captureInterval);
+                checkAndSubmitForm();
+            }
+        }
+
+        function capturePhoto() {
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+            const photoDataUrl = canvas.toDataURL("image/png");
+            photoDataUrls.push(photoDataUrl);
+
+            // Display the captured photo
+            const image = document.createElement("img");
+            image.src = photoDataUrl;
+            image.classList.add("w-full", "mb-2");
+            photoContainer.appendChild(image);
+
+            // Create a hidden input to hold the photo data
+            const photoInput = document.createElement("input");
+            photoInput.type = "hidden";
+            photoInput.name = "photo";
+            photoInput.value = photoDataUrl;
+            photoHiddenInputs.appendChild(photoInput);
+        }
+
+        function checkAndSubmitForm() {
+            if (photoDataUrls.length === maxPhotos) {
+                document.querySelector('form').submit();
+                showSuccessMessage();
+            }
+        }
+
+        function showSuccessMessage() {
+            alert("Đăng ký thành công");
+        }
+    </script>
+
     </body>
 </html>

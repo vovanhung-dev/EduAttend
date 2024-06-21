@@ -68,12 +68,22 @@ const ScheduleList = () => {
                 subject: values.subject,
                 classId: values.classId,
                 teacherId: values.teacherId,
-                examDate: values.examDate.format('YYYY-MM-DD'), 
-                startTime: values.startTime.format('HH:mm'),    
-                endTime: values.endTime.format('HH:mm'),       
+                examDate: values.examDate.format('YYYY-MM-DD'),
+                startTime: values.startTime.format('HH:mm'),
+                endTime: values.endTime.format('HH:mm'),
                 room: values.room
             };
             return axiosClient.post("/class/createExamSchedule", examScheduleData).then(response => {
+                if (response.message == "Sheet với tiêu đề này đã tồn tại") {
+                    setOpenModalCreate(false);
+                    handleCategoryList();
+                    return notification["error"]({
+                        message: `Thông báo`,
+                        description:
+                            'Lịch thi này đã tồn tại! Vui lòng kiểm tra lại',
+                    });
+                }
+
                 if (response === undefined) {
                     notification["error"]({
                         message: `Thông báo`,
@@ -103,9 +113,9 @@ const ScheduleList = () => {
                 subject: values.subject,
                 classId: values.classId,
                 teacherId: values.teacherId,
-                examDate: values.examDate.format('YYYY-MM-DD'), 
-                startTime: values.startTime.format('HH:mm'),    
-                endTime: values.endTime.format('HH:mm'),       
+                examDate: values.examDate.format('YYYY-MM-DD'),
+                startTime: values.startTime.format('HH:mm'),
+                endTime: values.endTime.format('HH:mm'),
                 room: values.room
             };
             return axiosClient.put("/class/updateExamSchedule/" + id, examScheduleData).then(response => {
@@ -208,9 +218,9 @@ const ScheduleList = () => {
                     subject: response.scheduleInfo.subject,
                     classId: response.scheduleInfo.class_id,
                     teacherId: response.scheduleInfo.teacher_id,
-                    examDate: dayjs(response.scheduleInfo.examDate), 
-                    startTime: dayjs(response.scheduleInfo.startTime),    
-                    endTime: dayjs(response.scheduleInfo.endTime),       
+                    examDate: dayjs(response.scheduleInfo.examDate),
+                    startTime: dayjs(response.scheduleInfo.startTime),
+                    endTime: dayjs(response.scheduleInfo.endTime),
                     room: response.scheduleInfo.room
 
                 });
@@ -231,7 +241,7 @@ const ScheduleList = () => {
         }
     }
 
-   
+
 
     const columns = [
         {
@@ -583,7 +593,7 @@ const ScheduleList = () => {
                             }}
                             scrollToFirstError
                         >
-                           <Form.Item
+                            <Form.Item
                                 name="subject"
                                 label="Môn thi"
                                 rules={[

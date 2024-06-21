@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "eduattend",
+  "private_key_id": "3f61132a1d0bde8fd830b015cbc83c69d27de41e",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCoOFppYjvuMexY\nrdV81/t0HUhGjwsRI63mp6GXyIInaHScLYaGR3MnEmLic3UPylyVpyWKedtYnzfC\n8OOb3xZxFPko3trfaI5UnjmsHhNzWl08TxeH8xxNRojrBsrs3xUdimmxflV2pudn\nJ0lnkXYUXifB0qE0h7yllhYkLZORN0zkM543cY8J4EWe0t3X8yC6uAMoslRCjpvd\n9GmZxViSYXJ45GD0cLNk8Mv2vZt0QqB1XKww49Nta1lPRr21s4nsihabWmfzFQ/n\nZnQPKYu02xECkkUuDACXfADID0oYXPNgQez1lI4VCAH+JwjeSgM8TOQ+FWj/C2g/\nzrtQzvBPAgMBAAECggEABbMXGR/7cNgfLmgBZj/5JJeDZeSd1uBTGZAPcRGZm1U2\nMj52ouET3TyJvit0SWstVOK7amQzkt6eKIw54gOegolX4dMfLlegDuznflXsicmD\nhDIX1YLesB2WMQRjZsAuOniAmUNzCNih2YRiv9AVZJ5GEZKd5KY+tYuOx34F1HMx\njayJuSbKLPVYCbiTlw7/HU3CX1L2quAmeZSrvXJKp2CbcPxYVivnM8a5RUWa33rm\n2Z59BorANq1egVBG/ewYK3M0TLhMe/Dd2i+MYbVUk3y5zre6w2s6NzfLjpmvV8cu\nj8b1elThBhIveoxliyfFn8w4ZxGFDtXHCf/ACN9iIQKBgQDpyUuNvFVPrnhB2E4k\nPw4RExi3Uf8yLa3vNkMLifi6fWQonhB8KdmhZOgCRCTQh+wvKzpLhaflAcfNCN/R\nus/j6XTe7/EI444FALzmydBAj9mShlZg8iryEcRWYfFJ8LywNzoQq60Qvb4KdCbQ\n6g5Z3JPowgh6zZ0l+T5CIfJULwKBgQC4NDO0vxJpAWu0VWgKKz6e+4KC4TXBxp3/\nLPNVZsgNURUsnkSNSOtrRWOwKVv1+VVsrPS005x06e3F9M1g+ci3wvBajafVqm+a\n5DHubiMEYL+hQGT+j3cIXFPLGHEhekkfQJrh9kdBDOc3RGFlmkVfD9hRZkUP0RFZ\npcKQDch94QKBgHGd3FQTlTpWRidp4gAHjOSLbVWaSfWu8Xrx2f9/nBu12LlMqCJP\njG69RWvkhie6BvSdg4U0fXX0OY/RokShD2tqB9xYq8FwJZMU2rkml0jpIAnvs4cF\n6g0eyVZZ3xPaJTlWfaegZ0ldjUAzVrHtLfBKHK/frJNR3e+Yg8NMECMNAoGAKZ7h\n7/0cU82WYHDLyUBsLc/2dUwdsWMHYBjwAmPu39NqTWKVarcHOn27QJqXxMRJoPyT\nbihCOciBiTD/FuJZj+vkExHe0lBoVz8oaQ9JqjuSEQVTzJDt/F2gMUuchEv1KbKX\nTGcxQml/9OTmfOaWthwGbJ4HDMPYf8EMbTAwFQECgYBpBkMN/OV6sQX4LH/6MlI7\nQ3xT+4xcKD9w0uzCcqi50D7se1LxdSY//CDavdPaZVx1et8IsGNkoGMfnjwRxI8x\n22+YUvbwbPpW/I++vRNUx7aXvJLdCXN2aTXV8Crk2OFvdtP+DdovdCkr5RYXgY+e\nHAy2ve9EdKFBEhcauCFRwA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "edtuattend@eduattend.iam.gserviceaccount.com",
+  "client_id": "117521914998193500368",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/edtuattend%40eduattend.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
