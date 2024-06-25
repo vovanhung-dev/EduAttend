@@ -21,7 +21,7 @@
         font-weight: bold; 
         }
     h3{
-        color: #FFFFFF;
+        color: #FFFFFF!important;
     }
     form {
         padding: 20px;
@@ -85,6 +85,29 @@
             font-size: 14px;
             color: #666;
         }
+
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #333;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+            margin-top: 20px;
+            display: none; /* Ẩn ban đầu */
+        }
+
+        .loading-text {
+            color: #333;
+            font-size: 18px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
 
 
 /* Style the scrollbar track */
@@ -227,7 +250,10 @@
             </form>
 
         </section>
-
+        <section>
+            <div id="loading" class="loading-spinner"></div>
+            <p id="loading-text" class="loading-text"></p>
+        </section>
         <section class="body-font">
             <div class="bg-gray-900  px-5 py-12 mx-auto">
                 <form id="uploadForm" enctype="multipart/form-data">
@@ -307,75 +333,89 @@
 
         <script>
             function uploadImage() {
-    var form = document.getElementById('uploadForm');
-    var formData = new FormData(form);
+            var form = document.getElementById('uploadForm');
+            var formData = new FormData(form);
 
-    var fileInput = document.querySelector('input[type="file"]');
-    var file = fileInput.files[0];
+            var fileInput = document.querySelector('input[type="file"]');
+            var file = fileInput.files[0];
 
-    var reader = new FileReader();
-    reader.readAsDataURL(file);
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
 
-    reader.onload = function () {
-        var base64Image = reader.result.split(',')[1];  // Lấy phần base64 sau dấu phẩy
-        formData.append('imageBase64', base64Image);
+            reader.onload = function () {
+                var base64Image = reader.result.split(',')[1];
+                formData.append('imageBase64', base64Image);
 
-        fetch('/compare', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-    console.log(data);
-    let resultElement = document.getElementById('result');
-    resultElement.innerHTML = ''; // Xóa nội dung cũ của phần tử 'result'
+                // Hiển thị loading
+                var loading = document.getElementById('loading');
+                var loadingText = document.getElementById('loading-text');
+                loading.style.display = 'block';
+                loadingText.innerText = 'Đang xử lý...';
 
-    if (data.match && data.matched_faces.length > 0) {
-        data.matched_faces.forEach(face => {
-            // Tạo phần tử div chứa thông tin kết quả mỗi khuôn mặt
-            let resultItem = document.createElement('div');
-            resultItem.classList.add('result-item');
+                fetch('/compare', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    loadingText.style.display = 'none';
+                    console.log(data);
+                    let resultElement = document.getElementById('result');
+                    resultElement.innerHTML = '';
 
-            // Tạo phần tử hình ảnh
-            let imgElement = document.createElement('img');
-            imgElement.src = face.target_image.url;
+                    if (data.match && data.matched_faces.length > 0) {
+                        data.matched_faces.forEach(face => {
+                            // Tạo phần tử div chứa thông tin kết quả mỗi khuôn mặt
+                            let resultItem = document.createElement('div');
+                            resultItem.classList.add('result-item');
 
-            // Tạo phần tử thông tin
-            let infoElement = document.createElement('div');
-            infoElement.classList.add('info');
-            let titleElement = document.createElement('h3');
-            titleElement.innerText = face.target_image.name;
-            let similarityElement = document.createElement('p');
-            similarityElement.innerText = `Độ tương đồng: ${face.similarity.toFixed(2)}%`;
+                            // Tạo phần tử hình ảnh
+                            let imgElement = document.createElement('img');
+                            imgElement.src = face.target_image.url;
 
-            // Thêm các phần tử vào 'resultItem'
-            infoElement.appendChild(titleElement);
-            infoElement.appendChild(similarityElement);
-            resultItem.appendChild(imgElement);
-            resultItem.appendChild(infoElement);
+                            // Tạo phần tử thông tin
+                            let infoElement = document.createElement('div');
+                            infoElement.classList.add('info');
+                            let titleElement = document.createElement('h3');
+                            titleElement.innerText = face.target_image.name;
+                            let similarityElement = document.createElement('p');
+                            similarityElement.innerText = `Độ tương đồng: ${face.similarity.toFixed(2)}%`;
 
-            // Thêm 'resultItem' vào phần tử 'result'
-            resultElement.appendChild(resultItem);
-        });
-    } else {
-        // Nếu không tìm thấy kết quả nào
-        let noResultElement = document.createElement('div');
-        noResultElement.innerText = 'Không tìm thấy kết quả nào';
-        noResultElement.classList.add('text-xl', 'text-white', 'p-8');
-        resultElement.appendChild(noResultElement);
-    }
-})
-.catch(error => {
-    console.error('Error:', error);
-});
+                            // Thêm các phần tử vào 'resultItem'
+                            infoElement.appendChild(titleElement);
+                            infoElement.appendChild(similarityElement);
+                            resultItem.appendChild(imgElement);
+                            resultItem.appendChild(infoElement);
 
+                            // Thêm 'resultItem' vào phần tử 'result'
+                            resultElement.appendChild(resultItem);
+                        });
+                    } else {
+                        // Nếu không tìm thấy kết quả nào
+                        let noResultElement = document.createElement('div');
+                        noResultElement.innerText = 'Không tìm thấy kết quả nào';
+                        noResultElement.classList.add('text-xl', 'text-white', 'p-8');
+                        resultElement.appendChild(noResultElement);
+                    }
 
-    };
+                    // Ẩn loading sau khi nhận kết quả
+                    loading.style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Xử lý khi có lỗi
+                    loadingText.innerText = 'Đã xảy ra lỗi!';
+                    setTimeout(() => {
+                        loading.style.display = 'none';
+                    }, 2000); // Ẩn loading sau 2 giây nếu có lỗi
+                });
+            };
 
-    reader.onerror = function (error) {
-        console.error('Error:', error);
-    };
-}
+            reader.onerror = function (error) {
+                console.error('Error:', error);
+                // Xử lý khi có lỗi
+            };
+        }
 
 
 
