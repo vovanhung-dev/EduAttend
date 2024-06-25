@@ -93,7 +93,7 @@ def compare_faces():
                         matched_faces.append({
                             'source_face': face_image_path,
                             'target_image': {
-                                'name': target_image_name,
+                                'name':  os.path.splitext(os.path.basename(target_image_name))[0],
                                 'url': presigned_url
                             },
                             'similarity': compare_response['FaceMatches'][0]['Similarity']
