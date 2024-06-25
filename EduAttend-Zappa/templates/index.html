@@ -41,9 +41,11 @@
         max-height: 400px;
     }
     #photo-container img {
-        width: 150px;
-        height: 150px;
-        object-fit: cover;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        max-width: 1200px;
+        max-height: 600px;
         margin: 5px; /* Add margin between images */
         border-radius: 5px;
     }
@@ -332,6 +334,25 @@
         </footer>
 
         <script>
+
+            function displayImageFromFile(file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var imageElement = document.createElement('img');
+                imageElement.src = e.target.result;
+                imageElement.classList.add('uploaded-image');
+                document.getElementById('photo-container').appendChild(imageElement);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function displayImageFromCanvas(canvas) {
+            var imageElement = document.createElement('img');
+            imageElement.src = canvas.toDataURL('image/jpeg');
+            imageElement.classList.add('uploaded-image');
+            document.getElementById('photo-container').appendChild(imageElement);
+        }
+
             function uploadImage() {
             var form = document.getElementById('uploadForm');
             var formData = new FormData(form);
@@ -345,6 +366,9 @@
             reader.onload = function () {
                 var base64Image = reader.result.split(',')[1];
                 formData.append('imageBase64', base64Image);
+
+                displayImageFromFile(file);
+
 
                 // Hiển thị loading
                 var loading = document.getElementById('loading');
@@ -422,6 +446,8 @@
         let videoStream = null;
 
     function startCamera() {
+        const photoContainer = document.getElementById('photo-container');
+    photoContainer.innerHTML = '';
         const constraints = {
             video: true
         };
@@ -446,6 +472,8 @@
             });
     }
 
+  
+
     function takeSnapshot() {
     const video = document.getElementById('camera');
     const canvas = document.getElementById('canvas');
@@ -454,6 +482,11 @@
     canvas.height = video.videoHeight;
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
     video.srcObject.getVideoTracks().forEach(track => track.stop());
+
+    const photoContainer = document.getElementById('photo-container');
+    photoContainer.innerHTML = '';
+
+    displayImageFromCanvas(canvas);
 
     // Convert canvas image to blob
     canvas.toBlob(function(blob) {
