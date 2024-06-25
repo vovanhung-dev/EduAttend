@@ -20,6 +20,9 @@
         font-size: 3em;
         font-weight: bold; 
         }
+    h3{
+        color: #FFFFFF;
+    }
     form {
         padding: 20px;
         font-weight: bold;
@@ -49,6 +52,39 @@
     color: #777;
     font-style: italic;
 }
+
+.result-container {
+            margin-top: 20px;
+        }
+        .result-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .result-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-right: 20px;
+        }
+        .result-item .info {
+            flex: 1;
+        }
+        .result-item .info h3 {
+            margin: 0 0 5px;
+            font-size: 18px;
+            color: #333;
+        }
+        .result-item .info p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
 
 
 /* Style the scrollbar track */
@@ -270,45 +306,78 @@
         </footer>
 
         <script>
-        function uploadImage() {
-            var form = document.getElementById('uploadForm');
-            var formData = new FormData(form);
+            function uploadImage() {
+    var form = document.getElementById('uploadForm');
+    var formData = new FormData(form);
 
-            fetch('/compare', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-    if (data.match) {
-        // Tạo một thẻ <img> mới
-        let imgElement = document.createElement('img');
-        // Thiết lập thuộc tính src của thẻ <img> để hiển thị ảnh từ URL
-        imgElement.src = data.target_image;
-        // Xóa nội dung cũ của div 'result'
-        document.getElementById('result').innerHTML = '';
-        // Thêm thẻ <img> vào trong div 'result'
-        document.getElementById('result').appendChild(imgElement);
-        // Áp dụng các lớp CSS từ Tailwind cho thẻ <img> để set kích thước cứng
-        imgElement.classList.add('h-96', 'w-96', 'object-cover', 'rounded-lg', 'shadow-md');
+    var fileInput = document.querySelector('input[type="file"]');
+    var file = fileInput.files[0];
 
-        // Tạo thẻ <p> để hiển thị thông báo đã điểm danh thành công
-        let successText = document.createElement('div');
-        successText.innerText = 'Đã điểm danh thành công và người được điểm danh là ' + data.target_image;
-        successText.classList.add('text-xl', 'text-white', 'p-8');
-        document.getElementById('result').appendChild(successText);
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    reader.onload = function () {
+        var base64Image = reader.result.split(',')[1];  // Lấy phần base64 sau dấu phẩy
+        formData.append('imageBase64', base64Image);
+
+        fetch('/compare', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+    console.log(data);
+    let resultElement = document.getElementById('result');
+    resultElement.innerHTML = ''; // Xóa nội dung cũ của phần tử 'result'
+
+    if (data.match && data.matched_faces.length > 0) {
+        data.matched_faces.forEach(face => {
+            // Tạo phần tử div chứa thông tin kết quả mỗi khuôn mặt
+            let resultItem = document.createElement('div');
+            resultItem.classList.add('result-item');
+
+            // Tạo phần tử hình ảnh
+            let imgElement = document.createElement('img');
+            imgElement.src = face.target_image.url;
+
+            // Tạo phần tử thông tin
+            let infoElement = document.createElement('div');
+            infoElement.classList.add('info');
+            let titleElement = document.createElement('h3');
+            titleElement.innerText = face.target_image.name;
+            let similarityElement = document.createElement('p');
+            similarityElement.innerText = `Độ tương đồng: ${face.similarity.toFixed(2)}%`;
+
+            // Thêm các phần tử vào 'resultItem'
+            infoElement.appendChild(titleElement);
+            infoElement.appendChild(similarityElement);
+            resultItem.appendChild(imgElement);
+            resultItem.appendChild(infoElement);
+
+            // Thêm 'resultItem' vào phần tử 'result'
+            resultElement.appendChild(resultItem);
+        });
     } else {
-        // Nếu không có sự trùng khớp, hiển thị thông báo văn bản
-        document.getElementById('result').innerText = 'No match found';
-        // Áp dụng các lớp CSS từ Tailwind cho thông báo văn bản
-        document.getElementById('result').classList.add('text-xl', 'text-white', 'p-8');
+        // Nếu không tìm thấy kết quả nào
+        let noResultElement = document.createElement('div');
+        noResultElement.innerText = 'Không tìm thấy kết quả nào';
+        noResultElement.classList.add('text-xl', 'text-white', 'p-8');
+        resultElement.appendChild(noResultElement);
     }
 })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('result').innerText = 'Error: ' + error.message;
-            });
-        }
+.catch(error => {
+    console.error('Error:', error);
+});
+
+
+    };
+
+    reader.onerror = function (error) {
+        console.error('Error:', error);
+    };
+}
+
+
 
         let videoStream = null;
 
