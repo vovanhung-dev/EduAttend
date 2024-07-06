@@ -107,11 +107,17 @@ def get_lich_thi(ma_lich_thi):
         with app.app_context():
             cur = mysql.connection.cursor()
 
-            # Truy vấn lấy thông tin lịch thi
+            # Truy vấn lấy thông tin lịch thi và tên giám thị
             cur.execute('''
-                SELECT ma_lich_thi, ngay, mon_hoc, phong, giam_thi_1, giam_thi_2, giam_thi_3, giam_thi_4 
-                FROM lich_thi 
-                WHERE ma_lich_thi = %s
+                SELECT lich_thi.ma_lich_thi, lich_thi.ngay, lich_thi.mon_hoc, lich_thi.phong, 
+                       giang_vien_1.hoten AS giam_thi_1, giang_vien_2.hoten AS giam_thi_2, 
+                       giang_vien_3.hoten AS giam_thi_3, giang_vien_4.hoten AS giam_thi_4
+                FROM lich_thi
+                LEFT JOIN giang_vien AS giang_vien_1 ON lich_thi.giam_thi_1 = giang_vien_1.ma_giang_vien
+                LEFT JOIN giang_vien AS giang_vien_2 ON lich_thi.giam_thi_2 = giang_vien_2.ma_giang_vien
+                LEFT JOIN giang_vien AS giang_vien_3 ON lich_thi.giam_thi_3 = giang_vien_3.ma_giang_vien
+                LEFT JOIN giang_vien AS giang_vien_4 ON lich_thi.giam_thi_4 = giang_vien_4.ma_giang_vien
+                WHERE lich_thi.ma_lich_thi = %s
             ''', (ma_lich_thi,))
             lich_thi_data = cur.fetchone()
 
@@ -119,8 +125,8 @@ def get_lich_thi(ma_lich_thi):
                 return jsonify({'error': 'Lich thi not found'})
 
             # Chuyển đổi dữ liệu lịch thi thành dictionary
-            columns = ['ma_lich_thi', 'ngay', 'mon_hoc', 'phong', 'giam_thi_1', 'giam_thi_2', 'giam_thi_3', 'giam_thi_4']
-            lich_thi_data_json = dict(zip(columns, lich_thi_data))
+            lich_thi_columns = ['ma_lich_thi', 'ngay', 'mon_hoc', 'phong', 'giam_thi_1', 'giam_thi_2', 'giam_thi_3', 'giam_thi_4']
+            lich_thi_data_json = dict(zip(lich_thi_columns, lich_thi_data))
 
             # Truy vấn lấy danh sách user tham gia thi
             cur.execute('''

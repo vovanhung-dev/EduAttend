@@ -56,7 +56,7 @@ function uploadImage() {
                     let resultElement = document.getElementById('result');
                     resultElement.innerHTML = '<p>Đã điểm danh thành công. Vui lòng chạy lại trang web để xem danh sách sinh viên đã điểm danh!</p>';
 
-                    
+
                 } else {
                     // Nếu không tìm thấy kết quả nào
                     let noResultElement = document.createElement('div');
@@ -156,32 +156,9 @@ function takeSnapshot() {
                 resultElement.innerHTML = '';
 
                 if (data.match && data.matched_faces.length > 0) {
-                    data.matched_faces.forEach(face => {
-                        // Create result item element
-                        let resultItem = document.createElement('div');
-                        resultItem.classList.add('result-item');
-
-                        // Create image element
-                        let imgElement = document.createElement('img');
-                        imgElement.src = face.target_image.url;
-
-                        // Create info element
-                        let infoElement = document.createElement('div');
-                        infoElement.classList.add('info');
-                        let titleElement = document.createElement('h3');
-                        titleElement.innerText = face.target_image.name;
-                        let similarityElement = document.createElement('p');
-                        similarityElement.innerText = `Độ tương đồng: ${face.similarity.toFixed(2)}%`;
-
-                        // Append elements
-                        infoElement.appendChild(titleElement);
-                        infoElement.appendChild(similarityElement);
-                        resultItem.appendChild(imgElement);
-                        resultItem.appendChild(infoElement);
-
-                        // Append result item to result element
-                        resultElement.appendChild(resultItem);
-                    });
+                    // Hiển thị thông báo đã điểm danh thành công
+                    let resultElement = document.getElementById('result');
+                    resultElement.innerHTML = '<p>Đã điểm danh thành công. Vui lòng chạy lại trang web để xem danh sách sinh viên đã điểm danh!</p>';
                 } else {
                     // No matching result found
                     let noResultElement = document.createElement('div');
@@ -252,12 +229,20 @@ function getSelectedSchedule() {
             .then(response => response.json())
             .then(data => {
                 const resultDiv = document.getElementById('result-2');
-                
+
                 // Construct HTML to display schedule details
                 let html = `
                     <p class="text-white text-lg pt-10">Môn học: ${data.lich_thi.mon_hoc}</p>
                     <p class="text-white">Ngày thi: ${new Date(data.lich_thi.ngay).toLocaleDateString('vi-VN')}</p>
                     <p class="text-white">Phòng thi: ${data.lich_thi.phong}</p>
+                    <p class="text-white">Giám thị:
+                        <ul class="text-white">
+                            <li>${data.lich_thi.giam_thi_1}</li>
+                            <li>${data.lich_thi.giam_thi_2}</li>
+                            <li>${data.lich_thi.giam_thi_3}</li>
+                            <li>${data.lich_thi.giam_thi_4}</li>
+                        </ul>
+                    </p>
                     <p class="text-white">Danh sách thí sinh:</p>
                     <div class="overflow-x-auto">
                     <table class="px-4 mt-4 min-w-full divide-y divide-gray-200 shadow-md rounded-lg overflow-hidden">
@@ -289,7 +274,7 @@ function getSelectedSchedule() {
                         </tbody>
                     </table>
                     </div>`;
-                
+
                 // Set innerHTML of resultDiv to display the constructed HTML
                 resultDiv.innerHTML = html;
 
