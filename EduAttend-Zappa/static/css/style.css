@@ -1,0 +1,140 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #e0e0e0;
+    margin: 0;
+    text-align: center;
+    background-size: cover;
+    background-position: center;
+}
+h1 {
+    color: #333;
+    font-size: 3em;
+    font-weight: bold; 
+    }
+h3{
+    color: #FFFFFF!important;
+}
+form {
+    padding: 20px;
+    font-weight: bold;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    display: inline-block;
+}
+
+#photo-container {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping to next row */
+    justify-content: center; /* Center align items */
+    align-items: center; /* Center align items */
+    overflow-y: auto;
+    max-height: 400px;
+}
+#photo-container img {
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    max-width: 1200px;
+    max-height: 600px;
+    margin: 5px; /* Add margin between images */
+    border-radius: 5px;
+}
+.note {
+margin-top: 20px;
+color: #777;
+font-style: italic;
+}
+
+.result-container {
+        margin-top: 20px;
+    }
+    .result-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+    .result-item img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-right: 20px;
+    }
+    .result-item .info {
+        flex: 1;
+    }
+    .result-item .info h3 {
+        margin: 0 0 5px;
+        font-size: 18px;
+        color: #333;
+    }
+    .result-item .info p {
+        margin: 0;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .loading-spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-left-color: #333;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+        margin-top: 20px;
+        display: none; /* Ẩn ban đầu */
+    }
+
+    .loading-text {
+        color: #333;
+        font-size: 18px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+
+
+/* Style the scrollbar track */
+    ::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    /* Style the scrollbar thumb */
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 6px;
+    }
+
+    /* Hover effect on the scrollbar thumb */
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    /* Style the scrollbar buttons (arrows) */
+    ::-webkit-scrollbar-button {
+        display: none;
+    }
+
+    /* Style the scrollbar corner */
+    ::-webkit-scrollbar-corner {
+        background: #f1f1f1;
+    }
+
+    /* For Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
+
+    

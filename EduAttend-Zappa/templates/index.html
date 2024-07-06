@@ -4,152 +4,10 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <script src="https://cdn.tailwindcss.com"></script>
+        <script src="../static/js/javascript.js"></script>
+        <link href="../static/css/style.css" rel="stylesheet">
 
         <title>Đăng ký</title>
-        <style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #e0e0e0;
-        margin: 0;
-        text-align: center;
-        background-size: cover;
-        background-position: center;
-    }
-    h1 {
-        color: #333;
-        font-size: 3em;
-        font-weight: bold; 
-        }
-    h3{
-        color: #FFFFFF!important;
-    }
-    form {
-        padding: 20px;
-        font-weight: bold;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        margin-top: 20px;
-        display: inline-block;
-    }
-
-    #photo-container {
-        display: flex;
-        flex-wrap: wrap; /* Allow wrapping to next row */
-        justify-content: center; /* Center align items */
-        align-items: center; /* Center align items */
-        overflow-y: auto;
-        max-height: 400px;
-    }
-    #photo-container img {
-        width: auto;
-        height: auto;
-        object-fit: contain;
-        max-width: 1200px;
-        max-height: 600px;
-        margin: 5px; /* Add margin between images */
-        border-radius: 5px;
-    }
-.note {
-    margin-top: 20px;
-    color: #777;
-    font-style: italic;
-}
-
-.result-container {
-            margin-top: 20px;
-        }
-        .result-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-        }
-        .result-item img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 50%;
-            margin-right: 20px;
-        }
-        .result-item .info {
-            flex: 1;
-        }
-        .result-item .info h3 {
-            margin: 0 0 5px;
-            font-size: 18px;
-            color: #333;
-        }
-        .result-item .info p {
-            margin: 0;
-            font-size: 14px;
-            color: #666;
-        }
-
-        .loading-spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: #333;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-            margin-top: 20px;
-            display: none; /* Ẩn ban đầu */
-        }
-
-        .loading-text {
-            color: #333;
-            font-size: 18px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-
-
-/* Style the scrollbar track */
-        ::-webkit-scrollbar {
-            width: 12px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        /* Style the scrollbar thumb */
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 6px;
-        }
-
-        /* Hover effect on the scrollbar thumb */
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
-        /* Style the scrollbar buttons (arrows) */
-        ::-webkit-scrollbar-button {
-            display: none;
-        }
-
-        /* Style the scrollbar corner */
-        ::-webkit-scrollbar-corner {
-            background: #f1f1f1;
-        }
-
-        /* For Firefox */
-        scrollbar-width: thin;
-        scrollbar-color: #888 #f1f1f1;
-
-        
-
-
-</style>
     </head>
     <body>
         <header class="text-gray-400 bg-gray-900 body-font">
@@ -245,40 +103,54 @@
                 </div>
             </div>
         </section>
-        <section class="text-gray-400 bg-gray-900 body-font">
-            <form id="uploadForm" enctype="multipart/form-data">
-                <input type="file" name="file" id="fileInput">
-                <button type="button" onclick="uploadImage()">Upload</button>
-            </form>
+        <div class="text-center my-8">
+            <label for="examSchedule">Chọn mã lịch thi:</label>
+            <select id="examSchedule" class="rounded-md px-4 py-2 bg-gray-800 text-white">
+                <option value="">Chọn mã lịch thi</option>
+            </select>
+            <button onclick="getSelectedSchedule()" class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Xem chi tiết</button>
+        </div>
 
+        <section class="text-gray-400 bg-gray-900 body-font my-2">
+            <div id="result-2"></div>
         </section>
-        <section>
-            <div id="loading" class="loading-spinner"></div>
-            <p id="loading-text" class="loading-text"></p>
-        </section>
-        <section class="body-font">
-            <div class="bg-gray-900  px-5 py-12 mx-auto">
-                <form id="uploadForm" enctype="multipart/form-data">
-                    <input type="file" name="file" id="fileInput"
-                        class="hidden">
-                    <div
-                        class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <button type="button" onclick="startCamera()"
-                            class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Sử
-                            dụng Camera</button>
-                        <button type="button" onclick="takeSnapshot()"
-                            class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Chụp
-                            Ảnh</button>
-                    </div>
-                </form>
-                <div id="photo-container" class="mt-8"></div>
+
+        
+        <section class="text-gray-400 bg-gray-900 body-font">
+            <div class="container px-5 py-12 mx-auto text-center">
+                <!-- Nút chọn tùy chọn -->
+                <button onclick="showUploadOption()" class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Tải lên tệp</button>
+                <button onclick="showCameraOption()" class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Sử dụng camera</button>
             </div>
         </section>
-
+        
+        <!-- Phần tải lên tệp -->
+        <section id="upload-file-section" class="text-gray-400 bg-gray-900 body-font hidden">
+            <div class="container px-5 py-12 mx-auto">
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <input type="file" name="file" id="fileInput">
+                    <button type="button" onclick="uploadImage()" class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Tải lên</button>
+                </form>
+            </div>
+        </section>
+        
+        <!-- Phần sử dụng camera -->
+        <section id="camera-section" class="text-gray-400 bg-gray-900 body-font hidden">
+            <div class="container px-5 py-12 mx-auto">
+                <div id="photo-container" class="mb-6"></div>
+                <button type="button" onclick="startCamera()" class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Bắt đầu camera</button>
+                <button type="button" onclick="takeSnapshot()" class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Chụp ảnh</button>
+            </div>
+        </section>
+        
+        <section>
+            <div id="loading" class="loading-spinner hidden"></div>
+            <p id="loading-text" class="loading-text hidden"></p>
+        </section>
+        
         <section class="text-gray-400 bg-gray-900 body-font">
-    <div id="result" class="flex items-center justify-center h-96"></div>
-</section>
-
+            <div id="result" class="flex items-center justify-center h-96"></div>
+        </section>
 
         <footer class="text-gray-400 bg-gray-900 body-font">
             <div
@@ -332,244 +204,6 @@
                 </div>
             </div>
         </footer>
-
-        <script>
-
-            function displayImageFromFile(file) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                var imageElement = document.createElement('img');
-                imageElement.src = e.target.result;
-                imageElement.classList.add('uploaded-image');
-                document.getElementById('photo-container').appendChild(imageElement);
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function displayImageFromCanvas(canvas) {
-            var imageElement = document.createElement('img');
-            imageElement.src = canvas.toDataURL('image/jpeg');
-            imageElement.classList.add('uploaded-image');
-            document.getElementById('photo-container').appendChild(imageElement);
-        }
-
-            function uploadImage() {
-            var form = document.getElementById('uploadForm');
-            var formData = new FormData(form);
-
-            var fileInput = document.querySelector('input[type="file"]');
-            var file = fileInput.files[0];
-
-            var reader = new FileReader();
-            reader.readAsDataURL(file);
-
-            reader.onload = function () {
-                var base64Image = reader.result.split(',')[1];
-                formData.append('imageBase64', base64Image);
-
-                displayImageFromFile(file);
-
-
-                // Hiển thị loading
-                var loading = document.getElementById('loading');
-                var loadingText = document.getElementById('loading-text');
-                loading.style.display = 'block';
-                loadingText.innerText = 'Đang xử lý...';
-
-                fetch('/compare', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    loadingText.style.display = 'none';
-                    console.log(data);
-                    let resultElement = document.getElementById('result');
-                    resultElement.innerHTML = '';
-
-                    if (data.match && data.matched_faces.length > 0) {
-                        data.matched_faces.forEach(face => {
-                            // Tạo phần tử div chứa thông tin kết quả mỗi khuôn mặt
-                            let resultItem = document.createElement('div');
-                            resultItem.classList.add('result-item');
-
-                            // Tạo phần tử hình ảnh
-                            let imgElement = document.createElement('img');
-                            imgElement.src = face.target_image.url;
-
-                            // Tạo phần tử thông tin
-                            let infoElement = document.createElement('div');
-                            infoElement.classList.add('info');
-                            let titleElement = document.createElement('h3');
-                            titleElement.innerText = face.target_image.name;
-                            let similarityElement = document.createElement('p');
-                            similarityElement.innerText = `Độ tương đồng: ${face.similarity.toFixed(2)}%`;
-
-                            // Thêm các phần tử vào 'resultItem'
-                            infoElement.appendChild(titleElement);
-                            infoElement.appendChild(similarityElement);
-                            resultItem.appendChild(imgElement);
-                            resultItem.appendChild(infoElement);
-
-                            // Thêm 'resultItem' vào phần tử 'result'
-                            resultElement.appendChild(resultItem);
-                        });
-                    } else {
-                        // Nếu không tìm thấy kết quả nào
-                        let noResultElement = document.createElement('div');
-                        noResultElement.innerText = 'Không tìm thấy kết quả nào';
-                        noResultElement.classList.add('text-xl', 'text-white', 'p-8');
-                        resultElement.appendChild(noResultElement);
-                    }
-
-                    // Ẩn loading sau khi nhận kết quả
-                    loading.style.display = 'none';
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    // Xử lý khi có lỗi
-                    loadingText.innerText = 'Đã xảy ra lỗi!';
-                    setTimeout(() => {
-                        loading.style.display = 'none';
-                    }, 2000); // Ẩn loading sau 2 giây nếu có lỗi
-                });
-            };
-
-            reader.onerror = function (error) {
-                console.error('Error:', error);
-                // Xử lý khi có lỗi
-            };
-        }
-
-
-
-        let videoStream = null;
-
-    function startCamera() {
-        const photoContainer = document.getElementById('photo-container');
-    photoContainer.innerHTML = '';
-        const constraints = {
-            video: true
-        };
-
-        navigator.mediaDevices.getUserMedia(constraints)
-            .then(function(stream) {
-                videoStream = stream;
-                const video = document.createElement('video');
-                video.setAttribute('autoplay', '');
-                video.setAttribute('playsinline', '');
-                video.setAttribute('id', 'camera');
-                video.srcObject = stream;
-                document.getElementById('photo-container').appendChild(video);
-
-                const canvas = document.createElement('canvas');
-                canvas.setAttribute('id', 'canvas');
-                canvas.style.display = 'none';
-                document.getElementById('photo-container').appendChild(canvas);
-            })
-            .catch(function(err) {
-                console.error('Error accessing the camera: ', err);
-            });
-    }
-
-  
-
-    function takeSnapshot() {
-    const video = document.getElementById('camera');
-    const canvas = document.getElementById('canvas');
-    const context = canvas.getContext('2d');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    video.srcObject.getVideoTracks().forEach(track => track.stop());
-
-    const photoContainer = document.getElementById('photo-container');
-    photoContainer.innerHTML = '';
-
-    displayImageFromCanvas(canvas);
-
-    // Convert canvas image to blob
-    canvas.toBlob(function(blob) {
-        const formData = new FormData();
-        formData.append('file', blob, 'camera.jpg');
-
-        // Display loading spinner
-        const loading = document.getElementById('loading');
-        const loadingText = document.getElementById('loading-text');
-        loading.style.display = 'block';
-        loadingText.innerText = 'Đang xử lý...';
-
-        // Send image data to server for processing
-        fetch('/compare', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            loading.style.display = 'none';
-            console.log(data);
-            loadingText.style.display = 'none';
-
-            let resultElement = document.getElementById('result');
-            resultElement.innerHTML = '';
-
-            if (data.match && data.matched_faces.length > 0) {
-                data.matched_faces.forEach(face => {
-                    // Create result item element
-                    let resultItem = document.createElement('div');
-                    resultItem.classList.add('result-item');
-
-                    // Create image element
-                    let imgElement = document.createElement('img');
-                    imgElement.src = face.target_image.url;
-
-                    // Create info element
-                    let infoElement = document.createElement('div');
-                    infoElement.classList.add('info');
-                    let titleElement = document.createElement('h3');
-                    titleElement.innerText = face.target_image.name;
-                    let similarityElement = document.createElement('p');
-                    similarityElement.innerText = `Độ tương đồng: ${face.similarity.toFixed(2)}%`;
-
-                    // Append elements
-                    infoElement.appendChild(titleElement);
-                    infoElement.appendChild(similarityElement);
-                    resultItem.appendChild(imgElement);
-                    resultItem.appendChild(infoElement);
-
-                    // Append result item to result element
-                    resultElement.appendChild(resultItem);
-                });
-            } else {
-                // No matching result found
-                let noResultElement = document.createElement('div');
-                noResultElement.innerText = 'Không tìm thấy kết quả nào';
-                noResultElement.classList.add('text-xl', 'text-white', 'p-8');
-                resultElement.appendChild(noResultElement);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            loadingText.innerText = 'Đã xảy ra lỗi!';
-            setTimeout(() => {
-                loading.style.display = 'none';
-            }, 2000); // Hide loading after 2 seconds on error
-        });
-    }, 'image/jpeg');
-}
-
-
-    function dataURItoBlob(dataURI) {
-        const byteString = atob(dataURI.split(',')[1]);
-        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) {
-            ia[i] = byteString.charCodeAt(i);
-        }
-        return new Blob([ab], { type: mimeString });
-    }
-    </script>
 
     </body>
 </html>
