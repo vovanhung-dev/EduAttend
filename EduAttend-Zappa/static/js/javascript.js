@@ -32,6 +32,10 @@ function uploadImage() {
 
         displayImageFromFile(file);
 
+        var maLichThi = document.getElementById('examSchedule').value;
+
+        console.log(maLichThi)
+        formData.append('ma_lich_thi', maLichThi);
 
         // Hiển thị loading
         var loading = document.getElementById('loading');
@@ -151,6 +155,9 @@ function takeSnapshot() {
     canvas.toBlob(function (blob) {
         const formData = new FormData();
         formData.append('file', blob, 'camera.jpg');
+
+        const maLichThi = document.getElementById('examSchedule').value;
+        formData.append('ma_lich_thi', maLichThi);
 
         // Display loading spinner
         const loading = document.getElementById('loading');

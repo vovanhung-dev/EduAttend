@@ -151,9 +151,57 @@ def get_lich_thi(ma_lich_thi):
 def index():
     return render_template('index.html')
 
+def get_users_for_exam(ma_lich_thi):
+    try:
+        with app.app_context():
+            cur = mysql.connection.cursor()
+
+            # Truy vấn lấy danh sách user từ lịch thi
+            cur.execute('''
+                SELECT user.ma_user, user.hoten, user.sdt, user.email
+                FROM user
+                INNER JOIN danh_sach_thi ON user.ma_user = danh_sach_thi.ma_user
+                WHERE danh_sach_thi.ma_lich_thi = %s
+            ''', (ma_lich_thi,))
+            users_data = cur.fetchall()
+
+            cur.close()
+
+            # Chuyển đổi kết quả từ tuple sang danh sách dictionaries
+            users_list = []
+            for user in users_data:
+                user_dict = {
+                    'ma_user': user[0],
+                    'hoten': user[1],
+                    'sdt': user[2],
+                    'email': user[3]
+                }
+                users_list.append(user_dict)
+
+            return users_list
+
+    except Exception as e:
+        traceback.print_exc()
+        return None
+
 @app.route('/compare', methods=['POST'])
 def compare_faces():
     try:
+        # Kiểm tra và lấy ma_lich_thi từ dữ liệu form
+        ma_lich_thi = request.form.get('ma_lich_thi')
+        print(f"ma_lich_thi: {ma_lich_thi}")
+
+        if not ma_lich_thi:
+            return jsonify({'error': 'Ma lich thi is required'})
+
+        # Lấy danh sách user từ lịch thi
+        users_data = get_users_for_exam(ma_lich_thi)
+
+        print(users_data)
+
+        if not users_data:
+            return jsonify({'error': 'Failed to fetch users for exam'})
+
         if 'file' in request.files:
             # Nếu người dùng upload ảnh từ file
             file = request.files['file']
@@ -217,6 +265,21 @@ def compare_faces():
 
                     # Nếu tìm thấy khuôn mặt khớp
                     if len(compare_response['FaceMatches']) > 0:
+
+                        matched_face_name = os.path.splitext(os.path.basename(target_image_name))[0]
+                        for user in users_data:
+                            if user['hoten'] == matched_face_name:  # Điều kiện so sánh có thể thay đổi tùy vào cách bạn lưu trữ
+                                # Cập nhật điểm danh thành True (1)
+                                with app.app_context():
+                                    cur = mysql.connection.cursor()
+                                    cur.execute('''
+                                        UPDATE danh_sach_thi
+                                        SET diem_danh = TRUE
+                                        WHERE ma_lich_thi = %s AND ma_user = %s
+                                    ''', (ma_lich_thi, user['ma_user']))
+                                    mysql.connection.commit()
+                                    cur.close()
+
                         # Tạo URL công khai cho ảnh từ S3
                         presigned_url = s3_client.generate_presigned_url(
                             'get_object',
