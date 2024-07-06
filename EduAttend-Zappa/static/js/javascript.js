@@ -34,7 +34,6 @@ function uploadImage() {
 
         var maLichThi = document.getElementById('examSchedule').value;
 
-        console.log(maLichThi)
         formData.append('ma_lich_thi', maLichThi);
 
         // Hiển thị loading
@@ -51,36 +50,13 @@ function uploadImage() {
             .then(data => {
                 loadingText.style.display = 'none';
                 console.log(data);
-                let resultElement = document.getElementById('result');
-                resultElement.innerHTML = '';
 
-                if (data.match && data.matched_faces.length > 0) {
-                    data.matched_faces.forEach(face => {
-                        // Tạo phần tử div chứa thông tin kết quả mỗi khuôn mặt
-                        let resultItem = document.createElement('div');
-                        resultItem.classList.add('result-item');
+                if (data.match) {
+                    // Hiển thị thông báo đã điểm danh thành công
+                    let resultElement = document.getElementById('result');
+                    resultElement.innerHTML = '<p>Đã điểm danh thành công. Vui lòng chạy lại trang web để xem danh sách sinh viên đã điểm danh!</p>';
 
-                        // Tạo phần tử hình ảnh
-                        let imgElement = document.createElement('img');
-                        imgElement.src = face.target_image.url;
-
-                        // Tạo phần tử thông tin
-                        let infoElement = document.createElement('div');
-                        infoElement.classList.add('info');
-                        let titleElement = document.createElement('h3');
-                        titleElement.innerText = face.target_image.name;
-                        let similarityElement = document.createElement('p');
-                        similarityElement.innerText = `Độ tương đồng: ${face.similarity.toFixed(2)}%`;
-
-                        // Thêm các phần tử vào 'resultItem'
-                        infoElement.appendChild(titleElement);
-                        infoElement.appendChild(similarityElement);
-                        resultItem.appendChild(imgElement);
-                        resultItem.appendChild(infoElement);
-
-                        // Thêm 'resultItem' vào phần tử 'result'
-                        resultElement.appendChild(resultItem);
-                    });
+                    
                 } else {
                     // Nếu không tìm thấy kết quả nào
                     let noResultElement = document.createElement('div');
