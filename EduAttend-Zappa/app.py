@@ -109,15 +109,16 @@ def get_lich_thi(ma_lich_thi):
 
             # Truy vấn lấy thông tin lịch thi và tên giám thị
             cur.execute('''
-                SELECT lich_thi.ma_lich_thi, lich_thi.ngay, lich_thi.mon_hoc, lich_thi.phong, 
-                       giang_vien_1.hoten AS giam_thi_1, giang_vien_2.hoten AS giam_thi_2, 
-                       giang_vien_3.hoten AS giam_thi_3, giang_vien_4.hoten AS giam_thi_4
+               SELECT lich_thi.ma_lich_thi, lich_thi.ngay, lich_thi.mon_hoc, lich_thi.phong, 
+                    user_1.hoten AS giam_thi_1, user_2.hoten AS giam_thi_2, 
+                    user_3.hoten AS giam_thi_3, user_4.hoten AS giam_thi_4
                 FROM lich_thi
-                LEFT JOIN giang_vien AS giang_vien_1 ON lich_thi.giam_thi_1 = giang_vien_1.ma_giang_vien
-                LEFT JOIN giang_vien AS giang_vien_2 ON lich_thi.giam_thi_2 = giang_vien_2.ma_giang_vien
-                LEFT JOIN giang_vien AS giang_vien_3 ON lich_thi.giam_thi_3 = giang_vien_3.ma_giang_vien
-                LEFT JOIN giang_vien AS giang_vien_4 ON lich_thi.giam_thi_4 = giang_vien_4.ma_giang_vien
+                LEFT JOIN user AS user_1 ON lich_thi.giam_thi_1 = user_1.ma_user
+                LEFT JOIN user AS user_2 ON lich_thi.giam_thi_2 = user_2.ma_user
+                LEFT JOIN user AS user_3 ON lich_thi.giam_thi_3 = user_3.ma_user
+                LEFT JOIN user AS user_4 ON lich_thi.giam_thi_4 = user_4.ma_user
                 WHERE lich_thi.ma_lich_thi = %s
+
             ''', (ma_lich_thi,))
             lich_thi_data = cur.fetchone()
 

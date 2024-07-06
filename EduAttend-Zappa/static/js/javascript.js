@@ -236,13 +236,14 @@ function getSelectedSchedule() {
                     <p class="text-white">Ngày thi: ${new Date(data.lich_thi.ngay).toLocaleDateString('vi-VN')}</p>
                     <p class="text-white">Phòng thi: ${data.lich_thi.phong}</p>
                     <p class="text-white">Giám thị:
-                        <ul class="text-white">
-                            <li>${data.lich_thi.giam_thi_1}</li>
-                            <li>${data.lich_thi.giam_thi_2}</li>
-                            <li>${data.lich_thi.giam_thi_3}</li>
-                            <li>${data.lich_thi.giam_thi_4}</li>
-                        </ul>
-                    </p>
+                    <ul class="text-white">
+                        ${data.lich_thi.giam_thi_1 ? `<li>${data.lich_thi.giam_thi_1}</li>` : ''}
+                        ${data.lich_thi.giam_thi_2 ? `<li>${data.lich_thi.giam_thi_2}</li>` : ''}
+                        ${data.lich_thi.giam_thi_3 ? `<li>${data.lich_thi.giam_thi_3}</li>` : ''}
+                        ${data.lich_thi.giam_thi_4 ? `<li>${data.lich_thi.giam_thi_4}</li>` : ''}
+                    </ul>
+                </p>
+                
                     <p class="text-white">Danh sách thí sinh:</p>
                     <div class="overflow-x-auto">
                     <table class="px-4 mt-4 min-w-full divide-y divide-gray-200 shadow-md rounded-lg overflow-hidden">
