@@ -8,10 +8,11 @@ import traceback
 
 app = Flask(__name__)
 
-app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_HOST'] = 'viaduct.proxy.rlwy.net'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'root'
+app.config['MYSQL_PASSWORD'] = 'FlGyqbZzoEJeTCNjtkpMzILgkvVezmVw'
 app.config['MYSQL_DB'] = 'eduattend-v2'
+app.config['MYSQL_PORT'] = 21865
 
 mysql = MySQL(app)
 
