@@ -17,8 +17,13 @@ app.config['MYSQL_PORT'] = 21865
 mysql = MySQL(app)
 
 # Khởi tạo client Rekognition và S3
-rekognition_client = boto3.client('rekognition', region_name='ap-southeast-2')
-s3_client = boto3.client('s3', region_name='ap-southeast-2')
+rekognition_client = boto3.client('rekognition', region_name='ap-southeast-2', aws_access_key_id='AKIAZQ3DR2KZG7ZGRQHV', 
+                         aws_secret_access_key='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')
+s3_client = boto3.client('s3', 
+                         region_name='ap-southeast-2', 
+                         aws_access_key_id='AKIAZQ3DR2KZG7ZGRQHV', 
+                         aws_secret_access_key='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')
+
 
 # Đường dẫn tạm thời để lưu trữ các khuôn mặt được nhận dạng
 temp_face_dir = tempfile.gettempdir()
