@@ -69,7 +69,7 @@ const AccountManagement = () => {
             key: 'student_id',
         },
         {
-            title: 'Role',
+            title: 'Phân quyền',
             dataIndex: 'role',
             key: 'role',
             width: '12%',

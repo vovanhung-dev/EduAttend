@@ -66,8 +66,7 @@ const DashBoard = () => {
                             </Breadcrumb.Item>
                         </Breadcrumb>
                     </div>
-                    {userData?.role == "isAdmin" ?
-                        <Row gutter={12} style={{ marginTop: 20 }}>
+                        {/* <Row gutter={12} style={{ marginTop: 20 }}>
                             <Col span={6}>
                                 <Card className="card_total" bordered={false}>
                                     <div className='card_number'>
@@ -125,70 +124,7 @@ const DashBoard = () => {
                             </Col>
 
                             
-                        </Row> :
-
-                        <Row gutter={12} style={{ marginTop: 20 }}>
-                            <Col span={6}>
-                                <Card className="card_total" bordered={false}>
-                                    <div className='card_number'>
-                                        <div>
-                                            <div className='number_total'>
-                                                {Number(totalResult?.userServicesRevenue)?.toLocaleString('vi-VN', {
-                                                    style: 'currency',
-                                                    currency: 'VND'
-                                                }) || '0 VND'}
-                                            </div>
-                                            <div className='title_total'>Tổng giá trị dịch vụ</div>
-                                        </div>
-                                        <div>
-                                            <ContactsTwoTone style={{ fontSize: 48 }} />
-                                        </div>
-                                    </div>
-                                </Card>
-                            </Col>
-                            <Col span={6}>
-                                <Card className="card_total" bordered={false}>
-                                    <div className='card_number'>
-                                        <div>
-                                            <div className='number_total'>{totalResult?.userServicesCount}</div>
-                                            <div className='title_total'>Tổng dịch vụ</div>
-                                        </div>
-                                        <div>
-                                            <NotificationTwoTone style={{ fontSize: 48 }} />
-                                        </div>
-                                    </div>
-                                </Card>
-                            </Col>
-
-                            <Col span={6}>
-                                <Card className="card_total" bordered={false}>
-                                    <div className='card_number'>
-                                        <div>
-                                            <div className='number_total'>{totalResult?.userCampgroundsCount}</div>
-                                            <div className='title_total'>Tổng khu cắm trại</div>
-                                        </div>
-                                        <div>
-                                            <EnvironmentTwoTone style={{ fontSize: 48 }} />
-                                        </div>
-                                    </div>
-                                </Card>
-                            </Col>
-
-                            <Col span={6}>
-                                <Card className="card_total" bordered={false}>
-                                    <div className='card_number'>
-                                        <div>
-                                            <div className='number_total'>{booking?.length}</div>
-                                            <div className='title_total'>Tổng số đặt vé</div>
-                                        </div>
-                                        <div>
-                                            <ProfileTwoTone style={{ fontSize: 48 }} />
-                                        </div>
-                                    </div>
-                                </Card>
-                            </Col>
-                        </Row>
-                    }
+                        </Row> */}
                 </div>
                 <BackTop style={{ textAlign: 'right' }} />
             </Spin>

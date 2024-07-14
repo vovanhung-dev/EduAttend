@@ -26,12 +26,6 @@ function Sidebar() {
       icon: <UserOutlined />
     },
     {
-      key: "class-list",
-      title: "Quản lý môn học",
-      link: "/class-list",
-      icon: <ShoppingOutlined />
-    },
-    {
       key: "schedule-list",
       title: "Quản lý lịch thi",
       link: "/schedule-list",

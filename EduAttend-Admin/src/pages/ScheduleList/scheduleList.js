@@ -3,8 +3,7 @@ import {
     EditOutlined,
     HomeOutlined,
     PlusOutlined,
-    ShoppingOutlined,
-    EyeOutlined
+    ShoppingOutlined
 } from '@ant-design/icons';
 import { PageHeader } from '@ant-design/pro-layout';
 import {
@@ -12,29 +11,27 @@ import {
     Breadcrumb,
     Button,
     Col,
-    Empty,
+    DatePicker,
     Form,
     Input,
-    Modal, Popconfirm,
+    Modal,
+    notification,
+    Popconfirm,
     Row,
+    Select,
     Space,
     Spin,
     Table,
-    Tag,
-    Select,
-    notification,
-    TimePicker,
-    DatePicker
+    TimePicker
 } from 'antd';
+import dayjs from 'dayjs';
+import moment from "moment";
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import axiosClient from '../../apis/axiosClient';
-import classApi from "../../apis/classApi";
-import "./scheduleList.css";
-import uploadFileApi from '../../apis/uploadFileApi';
+import examApi from "../../apis/examApi";
 import userApi from '../../apis/userApi';
-import moment from "moment";
-import dayjs from 'dayjs';
+import "./scheduleList.css";
 const { Option } = Select;
 
 const ScheduleList = () => {
@@ -46,11 +43,8 @@ const ScheduleList = () => {
     const [loading, setLoading] = useState(true);
     const [form] = Form.useForm();
     const [form2] = Form.useForm();
-    const [total, setTotalList] = useState();
     const [currentPage, setCurrentPage] = useState(1);
     const [id, setId] = useState();
-    const [image, setImage] = useState();
-    const [file, setUploadFile] = useState();
 
     const history = useHistory();
 
@@ -66,14 +60,14 @@ const ScheduleList = () => {
 
             const examScheduleData = {
                 subject: values.subject,
-                classId: values.classId,
-                teacherId: values.teacherId,
-                examDate: values.examDate.format('YYYY-MM-DD'),
-                startTime: values.startTime.format('HH:mm'),
-                endTime: values.endTime.format('HH:mm'),
-                room: values.room
+                room: values.room,
+                invigilator_1: values.invigilator_1,
+                invigilator_2: values.invigilator_2,
+                invigilator_3: values.invigilator_3,
+                invigilator_4: values.invigilator_4,
+                date: dayjs(values.date).format('YYYY-MM-DD'),
             };
-            return axiosClient.post("/class/createExamSchedule", examScheduleData).then(response => {
+            return axiosClient.post("/exam", examScheduleData).then(response => {
                 if (response.message == "Sheet với tiêu đề này đã tồn tại") {
                     setOpenModalCreate(false);
                     handleCategoryList();
@@ -111,14 +105,14 @@ const ScheduleList = () => {
         try {
             const examScheduleData = {
                 subject: values.subject,
-                classId: values.classId,
-                teacherId: values.teacherId,
-                examDate: values.examDate.format('YYYY-MM-DD'),
-                startTime: values.startTime.format('HH:mm'),
-                endTime: values.endTime.format('HH:mm'),
-                room: values.room
+                room: values.room,
+                invigilator_1: values.invigilator_1,
+                invigilator_2: values.invigilator_2,
+                invigilator_3: values.invigilator_3,
+                invigilator_4: values.invigilator_4,
+                date: dayjs(values.date).format('YYYY-MM-DD'),
             };
-            return axiosClient.put("/class/updateExamSchedule/" + id, examScheduleData).then(response => {
+            return axiosClient.put("/exam" + id, examScheduleData).then(response => {
                 if (response === undefined) {
                     notification["error"]({
                         message: `Thông báo`,
@@ -153,15 +147,9 @@ const ScheduleList = () => {
 
     const handleCategoryList = async () => {
         try {
-            await classApi.getListExamSchedules({ page: 1, limit: 10000 }).then((res) => {
+            await examApi.getListExams({ page: 1, limit: 10000 }).then((res) => {
                 console.log(res);
-                setCategory(res.schedules);
-                setLoading(false);
-            });
-
-            await classApi.getListClass({ page: 1, limit: 10000 }).then((res) => {
-                console.log(res);
-                setClassList(res.classes);
+                setCategory(res.data);
                 setLoading(false);
             });
 
@@ -179,7 +167,7 @@ const ScheduleList = () => {
     const handleDeleteCategory = async (id) => {
         setLoading(true);
         try {
-            await classApi.deleteExamSchedule(id).then(response => {
+            await examApi.deleteExam(id).then(response => {
                 if (response === undefined) {
                     notification["error"]({
                         message: `Thông báo`,
@@ -212,7 +200,7 @@ const ScheduleList = () => {
         setOpenModalUpdate(true);
         (async () => {
             try {
-                const response = await classApi.getDetailExamSchedule(id);
+                const response = await examApi.getDetailExam(id);
                 setId(id);
                 form2.setFieldsValue({
                     subject: response.scheduleInfo.subject,
@@ -234,20 +222,18 @@ const ScheduleList = () => {
 
     const handleFilter = async (name) => {
         try {
-            const res = await classApi.searchExamSchedule(name);
-            setCategory(res.schedules);
+            const res = await examApi.searchExams(name);
+            setCategory(res.data);
         } catch (error) {
             console.log('search to fetch category list:' + error);
         }
     }
 
-
-
     const columns = [
         {
             title: 'ID',
-            key: 'index',
-            render: (text, record, index) => index + 1,
+            dataIndex: 'exam_id',
+            key: 'exam_id',
         },
         {
             title: 'Môn thi',
@@ -255,70 +241,69 @@ const ScheduleList = () => {
             key: 'subject',
         },
         {
-            title: 'Lớp học',
-            dataIndex: 'class_id',
-            key: 'class_id',
-            render: (classId, record) => record.className, // Giả định rằng bạn có một cột tên lớp học
-        },
-        {
-            title: 'Giáo viên',
-            dataIndex: 'teacher_id',
-            key: 'teacher_id',
-            render: (teacherId, record) => record.teacherName, // Giả định rằng bạn có một cột tên giáo viên
-        },
-        {
-            title: 'Ngày thi',
-            dataIndex: 'exam_date',
-            key: 'exam_date',
-            render: (date) => moment(date).format('YYYY-MM-DD'),
-        },
-        {
-            title: 'Thời gian bắt đầu',
-            dataIndex: 'start_time',
-            key: 'start_time',
-            render: (time) => moment(time, 'HH:mm:ss').format('HH:mm'),
-        },
-        {
-            title: 'Thời gian kết thúc',
-            dataIndex: 'end_time',
-            key: 'end_time',
-            render: (time) => moment(time, 'HH:mm:ss').format('HH:mm'),
-        },
-        {
             title: 'Phòng thi',
             dataIndex: 'room',
             key: 'room',
         },
         {
+            title: 'Giám thị 1',
+            dataIndex: 'invigilator_1',
+            key: 'invigilator_1',
+            render: (invigilator) => invigilator ? `Giám thị ${invigilator}` : '-',
+        },
+        {
+            title: 'Giám thị 2',
+            dataIndex: 'invigilator_2',
+            key: 'invigilator_2',
+            render: (invigilator) => invigilator ? `Giám thị ${invigilator}` : '-',
+        },
+        {
+            title: 'Giám thị 3',
+            dataIndex: 'invigilator_3',
+            key: 'invigilator_3',
+            render: (invigilator) => invigilator ? `Giám thị ${invigilator}` : '-',
+        },
+        {
+            title: 'Giám thị 4',
+            dataIndex: 'invigilator_4',
+            key: 'invigilator_4',
+            render: (invigilator) => invigilator ? `Giám thị ${invigilator}` : '-',
+        },
+        {
+            title: 'Ngày thi',
+            dataIndex: 'date',
+            key: 'date',
+            render: (date) => moment(date).format('YYYY-MM-DD'),
+        },
+        {
             title: 'Ngày tạo',
             dataIndex: 'created_at',
             key: 'created_at',
-            render: (date) => moment(date).format('YYYY-MM-DD HH:mm'),
+            render: (createdAt) => moment(createdAt).format('YYYY-MM-DD HH:mm'),
         },
         {
             title: 'Ngày cập nhật',
             dataIndex: 'updated_at',
             key: 'updated_at',
-            render: (date) => moment(date).format('YYYY-MM-DD HH:mm'),
+            render: (updatedAt) => moment(updatedAt).format('YYYY-MM-DD HH:mm'),
         },
         {
             title: 'Action',
             key: 'action',
             render: (text, record) => (
-
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <Button
                         size="small"
                         icon={<EditOutlined />}
                         style={{ width: 150, borderRadius: 15, height: 30, marginBottom: 10 }}
-                        onClick={() => handleEditCategory(record.id)}
+                        onClick={() => handleEditCategory(record.exam_id)}
                     >
-                        {"Chỉnh sửa"}
+                        Chỉnh sửa
                     </Button>
 
                     <Popconfirm
                         title="Bạn có chắc chắn xóa lịch thi này?"
-                        onConfirm={() => handleDeleteCategory(record.id)}
+                        onConfirm={() => handleDeleteCategory(record.exam_id)}
                         okText="Yes"
                         cancelText="No"
                     >
@@ -327,29 +312,23 @@ const ScheduleList = () => {
                             icon={<DeleteOutlined />}
                             style={{ width: 150, borderRadius: 15, height: 30 }}
                         >
-                            {"Xóa"}
+                            Xóa
                         </Button>
                     </Popconfirm>
                 </div>
             ),
-        }
+        },
     ];
 
+
     const [teacherList, setTeacherList] = useState();
-    const [classList, setClassList] = useState();
 
     useEffect(() => {
         (async () => {
             try {
-                await classApi.getListExamSchedules({ page: 1, limit: 10000 }).then((res) => {
+                await examApi.getListExams({ page: 1, limit: 10000 }).then((res) => {
                     console.log(res);
-                    setCategory(res.schedules);
-                    setLoading(false);
-                });
-
-                await classApi.getListClass({ page: 1, limit: 10000 }).then((res) => {
-                    console.log(res);
-                    setClassList(res.classes);
+                    setCategory(res.data);
                     setLoading(false);
                 });
 
@@ -413,7 +392,6 @@ const ScheduleList = () => {
                         <Table columns={columns} pagination={{ position: ['bottomCenter'] }} dataSource={category} />
                     </div>
                 </div>
-
                 <Modal
                     title="Tạo lịch thi mới"
                     visible={openModalCreate}
@@ -439,13 +417,8 @@ const ScheduleList = () => {
                             form={form}
                             name="eventCreate"
                             layout="vertical"
-                            initialValues={{
-                                residence: ['zhejiang', 'hangzhou', 'xihu'],
-                                prefix: '86',
-                            }}
                             scrollToFirstError
                         >
-
                             <Form.Item
                                 name="subject"
                                 label="Môn thi"
@@ -458,88 +431,6 @@ const ScheduleList = () => {
                                 style={{ marginBottom: 10 }}
                             >
                                 <Input placeholder="Môn thi" />
-                            </Form.Item>
-
-                            <Form.Item
-                                name="classId"
-                                label="Lớp học"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Vui lòng chọn lớp học!',
-                                    },
-                                ]}
-                                style={{ marginBottom: 10 }}
-                            >
-                                <Select placeholder="Chọn lớp học">
-                                    {classList?.map((item) => (
-                                        <Option key={item.id} value={item.id}>
-                                            {item.name}
-                                        </Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
-
-                            <Form.Item
-                                name="teacherId"
-                                label="Giáo viên"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Vui lòng chọn giáo viên!',
-                                    },
-                                ]}
-                                style={{ marginBottom: 10 }}
-                            >
-                                <Select placeholder="Chọn giáo viên">
-                                    {teacherList?.map((item) => (
-                                        <Option key={item.id} value={item.id}>
-                                            {item.username}
-                                        </Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
-
-                            <Form.Item
-                                name="examDate"
-                                label="Ngày thi"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Vui lòng chọn ngày thi!',
-                                    },
-                                ]}
-                                style={{ marginBottom: 10 }}
-                            >
-                                <DatePicker format="YYYY-MM-DD" />
-                            </Form.Item>
-
-                            <Form.Item
-                                name="startTime"
-                                label="Thời gian bắt đầu"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Vui lòng chọn thời gian bắt đầu!',
-                                    },
-                                ]}
-                                style={{ marginBottom: 10 }}
-                            >
-                                <TimePicker format="HH:mm" />
-                            </Form.Item>
-
-                            <Form.Item
-                                name="endTime"
-                                label="Thời gian kết thúc"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Vui lòng chọn thời gian kết thúc!',
-                                    },
-                                ]}
-                                style={{ marginBottom: 10 }}
-                            >
-                                <TimePicker format="HH:mm" />
                             </Form.Item>
 
                             <Form.Item
@@ -556,10 +447,79 @@ const ScheduleList = () => {
                                 <Input placeholder="Phòng thi" />
                             </Form.Item>
 
+                            <Form.Item
+                                name="data"
+                                label="Ngày thi"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Vui lòng chọn ngày thi!',
+                                    },
+                                ]}
+                                style={{ marginBottom: 10 }}
+                            >
+                                <DatePicker format="YYYY-MM-DD" />
+                            </Form.Item>
 
+                            <Form.Item
+                                name="invigilator_1"
+                                label="Giám thị 1"
+                                style={{ marginBottom: 10 }}
+                            >
+                                <Select placeholder="Chọn giám thị">
+                                    {teacherList?.map((item) => (
+                                        <Option key={item.id} value={item.id}>
+                                            {item.username}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+
+                            <Form.Item
+                                name="invigilator_2"
+                                label="Giám thị 2"
+                                style={{ marginBottom: 10 }}
+                            >
+                                <Select placeholder="Chọn giám thị">
+                                    {teacherList?.map((item) => (
+                                        <Option key={item.id} value={item.id}>
+                                            {item.username}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+
+                            <Form.Item
+                                name="invigilator_3"
+                                label="Giám thị 3"
+                                style={{ marginBottom: 10 }}
+                            >
+                                <Select placeholder="Chọn giám thị">
+                                    {teacherList?.map((item) => (
+                                        <Option key={item.id} value={item.id}>
+                                            {item.username}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+
+                            <Form.Item
+                                name="invigilator_4"
+                                label="Giám thị 4"
+                                style={{ marginBottom: 10 }}
+                            >
+                                <Select placeholder="Chọn giám thị">
+                                    {teacherList?.map((item) => (
+                                        <Option key={item.id} value={item.id}>
+                                            {item.username}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
                         </Form>
                     </Spin>
                 </Modal>
+
 
                 <Modal
                     title="Chỉnh sửa lịch thi"
@@ -608,47 +568,21 @@ const ScheduleList = () => {
                             </Form.Item>
 
                             <Form.Item
-                                name="classId"
-                                label="Lớp học"
+                                name="room"
+                                label="Phòng thi"
                                 rules={[
                                     {
                                         required: true,
-                                        message: 'Vui lòng chọn lớp học!',
+                                        message: 'Vui lòng nhập phòng thi!',
                                     },
                                 ]}
                                 style={{ marginBottom: 10 }}
                             >
-                                <Select placeholder="Chọn lớp học">
-                                    {classList?.map((item) => (
-                                        <Option key={item.id} value={item.id}>
-                                            {item.name}
-                                        </Option>
-                                    ))}
-                                </Select>
+                                <Input placeholder="Phòng thi" />
                             </Form.Item>
 
                             <Form.Item
-                                name="teacherId"
-                                label="Giáo viên"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Vui lòng chọn giáo viên!',
-                                    },
-                                ]}
-                                style={{ marginBottom: 10 }}
-                            >
-                                <Select placeholder="Chọn giáo viên">
-                                    {teacherList?.map((item) => (
-                                        <Option key={item.id} value={item.id}>
-                                            {item.username}
-                                        </Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
-
-                            <Form.Item
-                                name="examDate"
+                                name="data"
                                 label="Ngày thi"
                                 rules={[
                                     {
@@ -662,45 +596,59 @@ const ScheduleList = () => {
                             </Form.Item>
 
                             <Form.Item
-                                name="startTime"
-                                label="Thời gian bắt đầu"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Vui lòng chọn thời gian bắt đầu!',
-                                    },
-                                ]}
+                                name="invigilator_1"
+                                label="Giám thị 1"
                                 style={{ marginBottom: 10 }}
                             >
-                                <TimePicker format="HH:mm" />
+                                <Select placeholder="Chọn giám thị">
+                                    {teacherList?.map((item) => (
+                                        <Option key={item.id} value={item.id}>
+                                            {item.username}
+                                        </Option>
+                                    ))}
+                                </Select>
                             </Form.Item>
 
                             <Form.Item
-                                name="endTime"
-                                label="Thời gian kết thúc"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Vui lòng chọn thời gian kết thúc!',
-                                    },
-                                ]}
+                                name="invigilator_2"
+                                label="Giám thị 2"
                                 style={{ marginBottom: 10 }}
                             >
-                                <TimePicker format="HH:mm" />
+                                <Select placeholder="Chọn giám thị">
+                                    {teacherList?.map((item) => (
+                                        <Option key={item.id} value={item.id}>
+                                            {item.username}
+                                        </Option>
+                                    ))}
+                                </Select>
                             </Form.Item>
 
                             <Form.Item
-                                name="room"
-                                label="Phòng thi"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Vui lòng nhập phòng thi!',
-                                    },
-                                ]}
+                                name="invigilator_3"
+                                label="Giám thị 3"
                                 style={{ marginBottom: 10 }}
                             >
-                                <Input placeholder="Phòng thi" />
+                                <Select placeholder="Chọn giám thị">
+                                    {teacherList?.map((item) => (
+                                        <Option key={item.id} value={item.id}>
+                                            {item.username}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+
+                            <Form.Item
+                                name="invigilator_4"
+                                label="Giám thị 4"
+                                style={{ marginBottom: 10 }}
+                            >
+                                <Select placeholder="Chọn giám thị">
+                                    {teacherList?.map((item) => (
+                                        <Option key={item.id} value={item.id}>
+                                            {item.username}
+                                        </Option>
+                                    ))}
+                                </Select>
                             </Form.Item>
                         </Form>
                     </Spin>

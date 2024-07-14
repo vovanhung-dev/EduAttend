@@ -30,11 +30,11 @@ db.connect((err) => {
 
 const authRoute = require('./app/routers/auth');
 const userRoute = require('./app/routers/user');
-const classRoute = require('./app/routers/class');
+const examRoute = require('./app/routers/exam');
 
 app.use('/api/auth', authRoute);
 app.use('/api/user', userRoute);
-app.use('/api/class', classRoute);
+app.use('/api/exam', examRoute);
 
 const PORT = process.env.PORT || _CONST.PORT;
 
