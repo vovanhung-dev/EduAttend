@@ -20,6 +20,7 @@ import {
     Spin,
     Table,
     Upload,
+    Tag,
     notification
 } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -181,6 +182,16 @@ const ScheduleDetails = () => {
             title: 'Phòng thi',
             dataIndex: 'room',
             key: 'room',
+        },
+        {
+            title: 'Điểm danh',
+            dataIndex: 'attendance',
+            key: 'attendance',
+            render: (attendance) => (
+                <Tag color={attendance === 1 ? 'green' : 'red'}>
+                    {attendance === 1 ? 'Đã điểm danh' : 'Chưa điểm danh'}
+                </Tag>
+            ),
         },
         // {
         //     title: 'Action',
