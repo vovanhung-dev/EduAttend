@@ -1,10 +1,9 @@
 import {
     DeleteOutlined,
-    EditOutlined,
     HomeOutlined,
     PlusOutlined,
     ShoppingOutlined,
-    EyeOutlined
+    DownloadOutlined
 } from '@ant-design/icons';
 import { PageHeader } from '@ant-design/pro-layout';
 import {
@@ -12,29 +11,27 @@ import {
     Breadcrumb,
     Button,
     Col,
-    Empty,
     Form,
-    Input,
     Modal, Popconfirm,
     Row,
+    Select,
     Space,
     Spin,
     Table,
-    Tag,
-    Select,
     notification
 } from 'antd';
 import React, { useEffect, useState } from 'react';
+
+import * as XLSX from 'xlsx';
 import { useHistory, useParams } from 'react-router-dom';
 import axiosClient from '../../apis/axiosClient';
-import classApi from "../../apis/classApi";
+import examApi from "../../apis/examApi";
 import userApi from "../../apis/userApi";
 
-import "./classDetails.css";
-import uploadFileApi from '../../apis/uploadFileApi';
+import "./scheduleDetails.css";
 const { Option } = Select;
 
-const ClassDetails = () => {
+const ScheduleDetails = () => {
 
     const [category, setCategory] = useState([]);
 
@@ -61,26 +58,29 @@ const ClassDetails = () => {
             console.log(values);
 
             const categoryList = {
-                "classId": id,
+                "examId": id,
                 "userId": values.students,
             }
-            return axiosClient.post("/class/addUser", categoryList).then(response => {
-                if (response === undefined) {
-                    notification["error"]({
-                        message: `Thông báo`,
-                        description:
-                            'Tạo sinh viên thất bại',
+            return axiosClient.post("/exam/addStudentToExamList", categoryList).then(response => {
+                if (response.message == "Student added to exam list successfully") {
+                    notification.success({
+                        message: 'Thông báo',
+                        description: 'Thêm sinh viên vào danh sách thi thành công',
                     });
-                }
-                else {
-                    notification["success"]({
-                        message: `Thông báo`,
-                        description:
-                            'Tạo sinh viên thành công',
-                    });
-                    setOpenModalCreate(false);
+                    setOpenModalCreate(false)
                     handleCategoryList();
+                } else if (response && response.status === 400) {
+                    notification.error({
+                        message: 'Thông báo',
+                        description: 'Sinh viên đã được gán cho kỳ thi này',
+                    });
+                } else {
+                    notification.error({
+                        message: 'Thông báo',
+                        description: 'Thêm sinh viên vào danh sách thi thất bại',
+                    });
                 }
+                setLoading(false)
             })
         } catch (error) {
             throw error;
@@ -98,9 +98,9 @@ const ClassDetails = () => {
 
     const handleCategoryList = async () => {
         try {
-            await classApi.getStudentsByClassId(id).then((res) => {
+            await examApi.getExamListByExamId(id).then((res) => {
                 console.log(res);
-                setCategory(res.students);
+                setCategory(res.data);
                 setLoading(false);
             });
         } catch (error) {
@@ -116,7 +116,7 @@ const ClassDetails = () => {
                 "userId": userId,
             }
 
-            await classApi.deleteUserClass(data).then(response => {
+            await examApi.deleteUserClass(data).then(response => {
                 if (response === undefined) {
                     notification["error"]({
                         message: `Thông báo`,
@@ -147,7 +147,7 @@ const ClassDetails = () => {
 
     const handleFilter = async (name) => {
         try {
-            const res = await classApi.searchClass(name);
+            const res = await examApi.searchClass(name);
             setCategory(res.classes);
         } catch (error) {
             console.log('search to fetch category list:' + error);
@@ -162,59 +162,56 @@ const ClassDetails = () => {
         },
         {
             title: 'Mã số sinh viên',
-            dataIndex: 'id',
-            key: 'id',
-            render: (text) => <a>SV000{text}</a>,
-        },
+            dataIndex: 'student_id',
+            key: 'student_id',
+            render: (text) => <a>{text}</a>,
+        }, 
         {
-            title: 'Ảnh',
-            dataIndex: 'image',
-            key: 'image',
-            render: (image) => <img src={image} style={{ height: 60 }} />,
-            width: '10%'
-        },
-        {
-            title: 'Tên',
+            title: 'Họ và tên',
             dataIndex: 'username',
             key: 'username',
-            render: (text) => <a>{text}</a>,
         },
         {
-            title: 'Mô tả',
-            dataIndex: 'email',
-            key: 'email',
+            title: 'Môn thi',
+            dataIndex: 'subject',
+            key: 'subject',
         },
         {
-            title: 'Action',
-            key: 'action',
-            render: (text, record) => (
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <Popconfirm
-                        title="Bạn có chắc chắn xóa sinh viên này?"
-                        onConfirm={() => handleDeleteCategory(record.id)}
-                        okText="Yes"
-                        cancelText="No"
-                    >
-                        <Button
-                            size="small"
-                            icon={<DeleteOutlined />}
-                            style={{ width: 150, borderRadius: 15, height: 30 }}
-                        >
-                            {"Xóa"}
-                        </Button>
-                    </Popconfirm>
-                </div>
-            ),
-        }
+            title: 'Phòng thi',
+            dataIndex: 'room',
+            key: 'room',
+        },
+        // {
+        //     title: 'Action',
+        //     key: 'action',
+        //     render: (text, record) => (
+        //         <div style={{ display: 'flex', flexDirection: 'column' }}>
+        //             <Popconfirm
+        //                 title="Bạn có chắc chắn xóa sinh viên này?"
+        //                 onConfirm={() => handleDeleteCategory(record.id)}
+        //                 okText="Yes"
+        //                 cancelText="No"
+        //             >
+        //                 <Button
+        //                     size="small"
+        //                     icon={<DeleteOutlined />}
+        //                     style={{ width: 150, borderRadius: 15, height: 30 }}
+        //                 >
+        //                     Xóa
+        //                 </Button>
+        //             </Popconfirm>
+        //         </div>
+        //     ),
+        // }
     ];
 
 
     useEffect(() => {
         (async () => {
             try {
-                await classApi.getStudentsByClassId(id).then((res) => {
+                await examApi.getExamListByExamId(id).then((res) => {
                     console.log(res);
-                    setCategory(res.students);
+                    setCategory(res.data);
                     setLoading(false);
                 });
 
@@ -229,6 +226,35 @@ const ClassDetails = () => {
             }
         })();
     }, [])
+
+    const handleExportToExcel = () => {
+        if (category.length === 0) {
+            notification.warning({
+                message: 'Thông báo',
+                description: 'Không có dữ liệu để xuất ra Excel',
+            });
+            return;
+        }
+
+        // Mapping data for export
+        const dataToExport = category.map(item => ({
+            'Mã số sinh viên': item.student_id,
+            'Họ và tên': item.username,
+            'Môn thi': item.subject,
+            'Phòng thi': item.room,
+        }));
+
+        // Call exportToExcel function from utils
+        exportToExcel(dataToExport, 'Danh sách sinh viên');
+    };
+
+    const exportToExcel = (data, fileName) => {
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+        XLSX.writeFile(workbook, `${fileName}.xlsx`);
+    };
+
     return (
         <div>
             <Spin spinning={loading}>
@@ -263,7 +289,8 @@ const ClassDetails = () => {
                                     <Col span="6">
                                         <Row justify="end">
                                             <Space>
-                                                <Button onClick={showModal} icon={<PlusOutlined />} style={{ marginLeft: 10 }} >Thêm sinh viên vào sinh viên</Button>
+                                                <Button onClick={showModal} icon={<PlusOutlined />} style={{ marginLeft: 10 }} >Thêm sinh viên vào lịch thi</Button>
+                                                <Button onClick={handleExportToExcel} icon={<DownloadOutlined />} style={{ marginLeft: 10 }} >Xuất Excel</Button>
                                             </Space>
                                         </Row>
                                     </Col>
@@ -326,7 +353,7 @@ const ClassDetails = () => {
                                 >
                                     {studentList?.map((item) => (
                                         <Option key={item.id} value={item.id}>
-                                            {item.username}
+                                            {item.username + " - " + item.student_id}
                                         </Option>
                                     ))}
                                 </Select>
@@ -343,4 +370,4 @@ const ClassDetails = () => {
     )
 }
 
-export default ClassDetails;
+export default ScheduleDetails;

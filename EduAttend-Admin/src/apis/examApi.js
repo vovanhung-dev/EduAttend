@@ -47,7 +47,12 @@ const examApi = {
     removeInvigilator(examId, invigilatorId) {
         const url = `/exam/${examId}/removeInvigilator`;
         return axiosClient.post(url, { invigilatorId });
-    }
+    },
+
+    getExamListByExamId(examId) {
+        const url = `/exam/exam_list/${examId}`;
+        return axiosClient.get(url);
+    },
 };
 
 export default examApi;

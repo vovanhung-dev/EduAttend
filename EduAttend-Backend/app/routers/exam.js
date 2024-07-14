@@ -3,6 +3,9 @@ const router = express.Router();
 const examController = require('../controllers/examController');
 
 
+// GET exam_list by exam_id
+router.get('/exam_list/:id', examController.getExamListByExamId);
+
 // SEARCH exams
 router.get('/search', examController.searchExams);
 
@@ -20,6 +23,8 @@ router.put('/:id', examController.updateExam);
 
 // DELETE exam by ID
 router.delete('/:id', examController.deleteExam);
+
+router.post('/addStudentToExamList', examController.addStudentToExamList);
 
 
 module.exports = router;

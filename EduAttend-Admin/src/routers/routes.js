@@ -74,17 +74,9 @@ const Register = lazy(() => {
         .then(([moduleExports]) => moduleExports);
 });
 
-const ClassList = lazy(() => {
+const ScheduleDetails = lazy(() => {
     return Promise.all([
-        import('../pages/ClassList/classList'),
-        new Promise(resolve => setTimeout(resolve, 0))
-    ])
-        .then(([moduleExports]) => moduleExports);
-});
-
-const ClassDetails = lazy(() => {
-    return Promise.all([
-        import('../pages/ClassDetails/classDetails'),
+        import('../pages/ScheduleDetails/scheduleDetails'),
         new Promise(resolve => setTimeout(resolve, 0))
     ])
         .then(([moduleExports]) => moduleExports);
@@ -152,15 +144,10 @@ const RouterURL = withRouter(({ location }) => {
                             </Suspense>
                         </PrivateRoute>
 
-                        <PrivateRoute exact path="/class-list">
-                            <Suspense fallback={<LoadingScreen />}>
-                                <ClassList />
-                            </Suspense>
-                        </PrivateRoute>
 
-                        <PrivateRoute exact path="/details-class/:id">
+                        <PrivateRoute exact path="/details-schedule/:id">
                             <Suspense fallback={<LoadingScreen />}>
-                                <ClassDetails />
+                                <ScheduleDetails />
                             </Suspense>
                         </PrivateRoute>
 
@@ -214,7 +201,7 @@ const RouterURL = withRouter(({ location }) => {
                         <DefaultContainer />
                     </Route>
 
-                    <Route exact path="/details-class/:id">
+                    <Route exact path="/details-schedule/:id">
                         <DefaultContainer />
                     </Route>
 

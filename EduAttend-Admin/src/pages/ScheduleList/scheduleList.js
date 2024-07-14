@@ -113,7 +113,7 @@ const ScheduleList = () => {
                 invigilator_4: values.invigilator_4,
                 date: dayjs(values.date).format('YYYY-MM-DD'),
             };
-            return axiosClient.put("/exam" + id, examScheduleData).then(response => {
+            return axiosClient.put("/exam/" + id, examScheduleData).then(response => {
                 if (response === undefined) {
                     notification["error"]({
                         message: `Thông báo`,
@@ -204,13 +204,13 @@ const ScheduleList = () => {
                 const response = await examApi.getDetailExam(id);
                 setId(id);
                 form2.setFieldsValue({
-                    subject: response.scheduleInfo.subject,
-                    classId: response.scheduleInfo.class_id,
-                    teacherId: response.scheduleInfo.teacher_id,
-                    examDate: dayjs(response.scheduleInfo.examDate),
-                    startTime: dayjs(response.scheduleInfo.startTime),
-                    endTime: dayjs(response.scheduleInfo.endTime),
-                    room: response.scheduleInfo.room
+                    subject: response.data.subject,
+                    room: response.data.room,
+                    invigilator_1: response.data.invigilator_1,
+                    invigilator_2: response.data.invigilator_2,
+                    invigilator_3: response.data.invigilator_3,
+                    invigilator_4: response.data.invigilator_4,
+                    date: dayjs(response.date)
 
                 });
                 console.log(form2);
@@ -301,7 +301,7 @@ const ScheduleList = () => {
                         size="small"
                         icon={<EyeOutlined />}
                         style={{ width: 150, borderRadius: 15, height: 30, marginBottom: 10 }}
-                        onClick={() => handleViewDetails(record.id)}
+                        onClick={() => handleViewDetails(record.exam_id)}
                     >
                         {"Xem chi tiết"}
                     </Button>
@@ -566,7 +566,7 @@ const ScheduleList = () => {
                             }}
                             scrollToFirstError
                         >
-                            <Form.Item
+                              <Form.Item
                                 name="subject"
                                 label="Môn thi"
                                 rules={[

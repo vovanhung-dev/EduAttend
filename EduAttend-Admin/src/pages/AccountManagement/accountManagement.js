@@ -40,7 +40,7 @@ const AccountManagement = () => {
             ),
         },
         {
-            title: 'Tên đăng nhập',
+            title: 'Họ và tên',
             dataIndex: 'username',
             key: 'username',
             render: (text, record) => (

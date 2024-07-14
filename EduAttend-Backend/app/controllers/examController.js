@@ -12,6 +12,59 @@ const examController = {
         }
     },
 
+    getExamListByExamId: async (req, res) => {
+        const examId = req.params.id;
+        try {
+            const query = `
+                SELECT exam_list.*, users.*, exams.date, exams.subject, exams.room
+                FROM exam_list
+                INNER JOIN users ON exam_list.user_id = users.id
+                INNER JOIN exams ON exam_list.exam_id = exams.exam_id
+                WHERE exam_list.exam_id = ?
+            `;
+            const [examList] = await db.execute(query, [examId]);
+            res.status(200).json({ data: examList });
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ message: 'Server error' });
+        }
+    },
+
+    addStudentToExamList: async (req, res) => {
+        const { examId, userId } = req.body;
+        
+        try {
+            // Check if the exam and user exist
+            const examQuery = 'SELECT * FROM exams WHERE exam_id = ?';
+            const [exam] = await db.execute(examQuery, [examId]);
+            if (exam.length === 0) {
+                return res.status(404).json({ message: 'Exam not found' });
+            }
+
+            const userQuery = 'SELECT * FROM users WHERE id = ?';
+            const [user] = await db.execute(userQuery, [userId]);
+            if (user.length === 0) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            // Check if the student is already in the exam list
+            const checkQuery = 'SELECT * FROM exam_list WHERE exam_id = ? AND user_id = ?';
+            const [existingStudent] = await db.execute(checkQuery, [examId, userId]);
+            if (existingStudent.length > 0) {
+                return res.status(400).json({ message: 'Student already assigned to the exam' });
+            }
+
+            // Add student to exam_list
+            const insertQuery = 'INSERT INTO exam_list (exam_id, user_id) VALUES (?, ?)';
+            await db.execute(insertQuery, [examId, userId]);
+
+            res.status(201).json({ message: 'Student added to exam list successfully' });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ message: 'Server error' });
+        }
+    },
+
     getExamById: async (req, res) => {
         const examId = req.params.id;
         try {
