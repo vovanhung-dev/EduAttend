@@ -3,7 +3,8 @@ import {
     HomeOutlined,
     PlusOutlined,
     ShoppingOutlined,
-    DownloadOutlined
+    DownloadOutlined,
+    UploadOutlined
 } from '@ant-design/icons';
 import { PageHeader } from '@ant-design/pro-layout';
 import {
@@ -12,12 +13,13 @@ import {
     Button,
     Col,
     Form,
-    Modal, Popconfirm,
+    Modal,
     Row,
     Select,
     Space,
     Spin,
     Table,
+    Upload,
     notification
 } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -43,7 +45,6 @@ const ScheduleDetails = () => {
     const [studentList, setStudentList] = useState();
     const [currentPage, setCurrentPage] = useState(1);
     const { id } = useParams();
-    const [file, setUploadFile] = useState();
 
     const history = useHistory();
 
@@ -165,7 +166,7 @@ const ScheduleDetails = () => {
             dataIndex: 'student_id',
             key: 'student_id',
             render: (text) => <a>{text}</a>,
-        }, 
+        },
         {
             title: 'Họ và tên',
             dataIndex: 'username',
@@ -255,6 +256,76 @@ const ScheduleDetails = () => {
         XLSX.writeFile(workbook, `${fileName}.xlsx`);
     };
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        setUploadFile(file);
+    };
+
+    const [uploadFile, setUploadFile] = useState(null);
+
+
+    const handleUploadFile = async () => {
+        if (!uploadFile) {
+            console.error("No file selected.");
+            return;
+        }
+    
+        setLoading(true);
+    
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheet = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheet];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    
+            try {
+                for (let i = 0; i < jsonData.length; i++) {
+                    const row = jsonData[i];
+                    const studentToAdd = {
+                        examId: id, // Replace id with your exam id variable
+                        userId: row[0], // Assuming the first column has student IDs
+                    };
+    
+                    const response = await axiosClient.post("/exam/addStudentToExamList", studentToAdd);
+    
+                    if (response.status === 200) {
+                        console.log(`Thêm sinh viên ${studentToAdd.userId} vào danh sách thi thành công`);
+                        // Handle success notification or other actions
+                    } else {
+                        console.error(`Thêm sinh viên ${studentToAdd.userId} vào danh sách thi thất bại:`, response.data);
+                        // Handle error notification or other actions
+                    }
+                }
+    
+                // Notify overall success if needed
+                notification.success({
+                    message: 'Thông báo',
+                    description: 'Thêm sinh viên vào danh sách thi thành công',
+                });
+    
+                // Close modal or refresh data after all students are added
+                setOpenModalCreate(false);
+                handleCategoryList();
+    
+            } catch (error) {
+                console.error('Thêm sinh viên vào danh sách thi thất bại:', error);
+                // Handle error notification or other actions
+                notification.error({
+                    message: 'Thông báo',
+                    description: 'Thêm sinh viên vào danh sách thi thất bại',
+                });
+    
+            } finally {
+                setLoading(false);
+            }
+        };
+    
+        reader.readAsArrayBuffer(uploadFile);
+    };
+    
+
     return (
         <div>
             <Spin spinning={loading}>
@@ -291,6 +362,10 @@ const ScheduleDetails = () => {
                                             <Space>
                                                 <Button onClick={showModal} icon={<PlusOutlined />} style={{ marginLeft: 10 }} >Thêm sinh viên vào lịch thi</Button>
                                                 <Button onClick={handleExportToExcel} icon={<DownloadOutlined />} style={{ marginLeft: 10 }} >Xuất Excel</Button>
+                                                <input type="file" accept=".xlsx, .xls" onChange={handleFileChange} />
+                                                <button onClick={handleUploadFile} disabled={!uploadFile || loading}>
+                                                    {loading ? 'Đang xử lý...' : 'Upload'}
+                                                </button>
                                             </Space>
                                         </Row>
                                     </Col>
