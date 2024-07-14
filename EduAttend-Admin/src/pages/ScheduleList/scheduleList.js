@@ -3,7 +3,8 @@ import {
     EditOutlined,
     HomeOutlined,
     PlusOutlined,
-    ShoppingOutlined
+    ShoppingOutlined,
+    EyeOutlined
 } from '@ant-design/icons';
 import { PageHeader } from '@ant-design/pro-layout';
 import {
@@ -229,6 +230,10 @@ const ScheduleList = () => {
         }
     }
 
+    const handleViewDetails = (id) => {
+        history.push(`/details-schedule/${id}`);
+    };
+
     const columns = [
         {
             title: 'ID',
@@ -292,6 +297,14 @@ const ScheduleList = () => {
             key: 'action',
             render: (text, record) => (
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <Button
+                        size="small"
+                        icon={<EyeOutlined />}
+                        style={{ width: 150, borderRadius: 15, height: 30, marginBottom: 10 }}
+                        onClick={() => handleViewDetails(record.id)}
+                    >
+                        {"Xem chi tiết"}
+                    </Button>
                     <Button
                         size="small"
                         icon={<EditOutlined />}
