@@ -2,7 +2,7 @@ const db = require('../config/db');
 
 const createTables = async () => {
     try {
-        // Tạo bảng "users" nếu chưa tồn tại
+        // Create "users" table if it does not exist
         await db.execute(`
             CREATE TABLE IF NOT EXISTS users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -13,12 +13,18 @@ const createTables = async () => {
                 role VARCHAR(255),
                 status VARCHAR(255) DEFAULT 'noactive',
                 image VARCHAR(255) DEFAULT 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+                full_name VARCHAR(255) NOT NULL,
+                phone_number VARCHAR(15) NOT NULL,
+                class VARCHAR(50) DEFAULT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )
-        `);
+            `);
+
 
         console.log('Table "users" created or already exists.');
+
+
 
         // Tạo bảng "password_reset_tokens" nếu chưa tồn tại
         await db.execute(`
@@ -48,8 +54,8 @@ const createTables = async () => {
 
         console.log('Table "class" created or already exists.');
 
-          // Create the junction table "class_users" to manage the many-to-many relationship
-          await db.execute(`
+        // Create the junction table "class_users" to manage the many-to-many relationship
+        await db.execute(`
           CREATE TABLE IF NOT EXISTS class_users (
               class_id INT NOT NULL,
               user_id INT NOT NULL,
@@ -59,8 +65,8 @@ const createTables = async () => {
           )
       `);
 
-       // Tạo bảng "exam_schedule" nếu chưa tồn tại
-       await db.execute(`
+        // Tạo bảng "exam_schedule" nếu chưa tồn tại
+        await db.execute(`
     CREATE TABLE IF NOT EXISTS exam_schedule (
         id INT AUTO_INCREMENT PRIMARY KEY,
         subject VARCHAR(255) NOT NULL,
@@ -77,7 +83,7 @@ const createTables = async () => {
     )
 `);
 
-   console.log('Table "exam_schedule" created or already exists.');
+        console.log('Table "exam_schedule" created or already exists.');
 
 
 

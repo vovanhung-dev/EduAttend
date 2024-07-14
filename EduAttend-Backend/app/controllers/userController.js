@@ -19,11 +19,11 @@ const userController = {
         }
     },
 
-
     createUser: async (req, res) => {
         try {
             const inputEmail = req.body.email;
             const inputPhone = req.body.phone;
+            const inputStudentId = req.body.student_id;
     
             // Check if email already exists
             const [checkEmailExist] = await db.execute('SELECT * FROM users WHERE email = ?', [inputEmail]);
@@ -37,26 +37,30 @@ const userController = {
                 return res.status(200).json("User with this phone number already exists");
             }
     
+            // Check if student_id already exists
+            const [checkStudentIdExist] = await db.execute('SELECT * FROM users WHERE student_id = ?', [inputStudentId]);
+            if (checkStudentIdExist.length > 0) {
+                return res.status(200).json("User with this student ID already exists");
+            }
+    
             const salt = await bcrypt.genSalt(10);
             const hashed = await bcrypt.hash(req.body.password, salt);
     
-            const { email, phone, username, role, status } = req.body;
+            const { email, phone, username, role, status, class: userClass, student_id } = req.body;
     
-            const values = [email || null, phone || null, username || null, hashed || null, role || null, status || null];
+            const values = [email || null, phone || null, username || null, hashed || null, role || null, status || null, userClass || null, student_id || null];
     
-            const query = 'INSERT INTO users (email, phone, username, password, role, status) VALUES (?, ?, ?, ?, ?, ?)';
+            const query = 'INSERT INTO users (email, phone, username, password, role, status, class, student_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
     
             const [result] = await db.execute(query, values);
             const userId = result.insertId;
     
-            res.status(200).json({ id: userId, email, phone, username, role, status });
+            res.status(200).json({ id: userId, email, phone, username, role, status, class: userClass, student_id });
         } catch (err) {
             res.status(500).json(err);
         }
     },
     
-
-
     deleteUser: async (req, res) => {
         try {
             const userId = req.params.id;
@@ -79,7 +83,7 @@ const userController = {
     updateUser: async (req, res) => {
         try {
             const userId = req.params.id;
-            const { username, email, password, role, phone, status } = req.body;
+            const { username, email, password, role, phone, status, full_name, class: userClass } = req.body;
     
             const [checkEmailExist] = await db.execute('SELECT * FROM users WHERE email = ? AND id != ?', [email, userId]);
     
@@ -99,8 +103,10 @@ const userController = {
                 updateValues.push(email);
             }
             if (password) {
+                const salt = await bcrypt.genSalt(10);
+                const hashedPassword = await bcrypt.hash(password, salt);
                 updateFields.push('password = ?');
-                updateValues.push(password);
+                updateValues.push(hashedPassword);
             }
             if (role) {
                 updateFields.push('role = ?');
@@ -113,6 +119,14 @@ const userController = {
             if (status) {
                 updateFields.push('status = ?');
                 updateValues.push(status);
+            }
+            if (full_name) {
+                updateFields.push('full_name = ?');
+                updateValues.push(full_name);
+            }
+            if (userClass) {
+                updateFields.push('class = ?');
+                updateValues.push(userClass);
             }
     
             if (updateFields.length === 0) {
@@ -134,9 +148,9 @@ const userController = {
             res.status(500).json(err);
         }
     },
-    
 
     logout: async (req, res) => {
+        // Implement logout functionality if needed
     },
 
     searchUserByEmail: async (req, res) => {
@@ -152,7 +166,6 @@ const userController = {
             res.status(500).json({ message: err.message });
         }
     },
-    
 
     getProfile: async (req, res) => {
         jwt.verify(req.headers.authorization, _const.JWT_ACCESS_KEY, async (err, decodedToken) => {
@@ -161,17 +174,13 @@ const userController = {
             } else {
                 try {
                     const userId = decodedToken.user.id;
-
-                    console.log(decodedToken)
     
-                    // Thực hiện truy vấn để lấy thông tin người dùng dựa trên userId
                     const [user] = await db.execute('SELECT * FROM users WHERE id = ?', [userId]);
     
                     if (user.length === 0) {
                         return res.status(404).json({ message: 'User not found' });
                     }
     
-                    // Trả về thông tin người dùng theo định dạng yêu cầu
                     const formattedUser = {
                         user: {
                             id: user[0].id,
@@ -182,6 +191,8 @@ const userController = {
                             role: user[0].role,
                             status: user[0].status,
                             image: user[0].image,
+                            full_name: user[0].full_name,
+                            class: user[0].class,
                             created_at: user[0].created_at,
                             updated_at: user[0].updated_at
                         },
@@ -197,12 +208,11 @@ const userController = {
             }
         });
     },
-    
 
     updateProfile: async (req, res) => {
         try {
             const userId = req.params.id;
-            const { username, email, phone, status, image, role } = req.body;
+            const { username, email, phone, status, image, role, full_name, class: userClass } = req.body;
     
             const updateFields = [];
             const updatedValues = [];
@@ -231,6 +241,14 @@ const userController = {
                 updateFields.push('role = ?');
                 updatedValues.push(role);
             }
+            if (full_name) {
+                updateFields.push('full_name = ?');
+                updatedValues.push(full_name);
+            }
+            if (userClass) {
+                updateFields.push('class = ?');
+                updatedValues.push(userClass);
+            }
     
             if (updateFields.length === 0) {
                 return res.status(400).json({ message: 'No fields to update' });
@@ -251,7 +269,6 @@ const userController = {
             res.status(500).json(err);
         }
     },
-    
 
     changePassword: async (req, res) => {
         try {
@@ -261,34 +278,27 @@ const userController = {
             const [user] = await db.execute('SELECT * FROM users WHERE id = ?', [userId]);
 
             if (user.length === 0) {
-                return res.status(200).json({ message: 'User not found' });
+                return res.status(404).json({ message: 'User not found' });
             }
 
-            const isPasswordValid = await bcrypt.compare(currentPassword, user[0].password);
+            const isMatch = await bcrypt.compare(currentPassword, user[0].password);
 
-            if (!isPasswordValid) {
-                return res.status(200).json({ message: 'Current password is incorrect' });
+            if (!isMatch) {
+                return res.status(400).json({ message: 'Current password is incorrect' });
             }
 
             const salt = await bcrypt.genSalt(10);
-            const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+            const hashedPassword = await bcrypt.hash(newPassword, salt);
 
             const updateQuery = 'UPDATE users SET password = ? WHERE id = ?';
+            await db.execute(updateQuery, [hashedPassword, userId]);
 
-            const updatedValues = [
-                hashedNewPassword || null,
-                userId
-            ];
-
-            await db.execute(updateQuery, updatedValues);
-
-            res.status(200).json("Password changed successfully");
+            res.status(200).json({ message: 'Password changed successfully' });
         } catch (err) {
             console.log(err);
             res.status(500).json(err);
         }
-    },
-
+    }
 };
 
 module.exports = userController;

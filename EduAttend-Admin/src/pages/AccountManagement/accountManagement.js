@@ -40,7 +40,7 @@ const AccountManagement = () => {
             ),
         },
         {
-            title: 'Tên',
+            title: 'Tên đăng nhập',
             dataIndex: 'username',
             key: 'username',
             render: (text, record) => (
@@ -62,6 +62,11 @@ const AccountManagement = () => {
             title: 'Số điện thoại',
             dataIndex: 'phone',
             key: 'phone',
+        },
+        {
+            title: 'Mã số người dùng',
+            dataIndex: 'student_id',
+            key: 'student_id',
         },
         {
             title: 'Role',
@@ -191,7 +196,6 @@ const AccountManagement = () => {
             }
             setIsModalVisible2(false);
             form.resetFields();
-            notification.success({ message: 'Role updated successfully' });
         } catch (error) {
             notification.error({ message: 'Failed to update role' });
         }
@@ -314,6 +318,7 @@ const AccountManagement = () => {
                 "phone": values.phone,
                 "password": values.password,
                 "role": values.role,
+                "student_id": values.student_id,
                 "status": "actived"
             }
             await axiosClient.post("/user", formatData)
@@ -457,6 +462,7 @@ const AccountManagement = () => {
                         </div>
                     </div>
                 </div>
+
                 <Modal
                     title="Thêm tài khoản"
                     visible={isModalVisible}
@@ -476,7 +482,7 @@ const AccountManagement = () => {
                     >
                         <Form.Item
                             name="name"
-                            label="Tên"
+                            label="Tên đăng nhập"
                             hasFeedback
                             rules={[
                                 {
@@ -567,6 +573,23 @@ const AccountManagement = () => {
                                 <Option value="isTeacher">Giảng viên</Option>
                             </Select>
                         </Form.Item>
+
+                        <Form.Item
+                            name="student_id"
+                            label="Mã số người dùng"
+                            hasFeedback
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng nhập mã số sinh viên!',
+                                },
+                                { max: 50, message: 'Mã số sinh viên tối đa 50 ký tự' },
+                            ]}
+                            style={{ marginBottom: 10 }}
+                        >
+                            <Input placeholder="Mã số sinh viên" />
+                        </Form.Item>
+
 
                         <Form.Item >
                             <Button style={{ background: "#FF8000", color: '#FFFFFF', float: 'right', marginTop: 20, marginLeft: 8 }} htmlType="submit">
