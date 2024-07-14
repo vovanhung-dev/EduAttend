@@ -145,7 +145,7 @@ const AccountManagement = () => {
                             >{"Chặn tài khoản"}
                             </Button>
                         </Popconfirm>}
-                        <Button size="small" icon={<CheckCircleOutlined />} style={{ width: 160, borderRadius: 15, height: 30, marginLeft: 10 }} onClick={() => showChangeRoleModal(record)}>
+                        <Button size="small" icon={<CheckCircleOutlined />} style={{ width: 160, borderRadius: 15, height: 30, marginTop: 6 }} onClick={() => showChangeRoleModal(record)}>
                             Thay đổi quyền
                         </Button>
                     </Row>
