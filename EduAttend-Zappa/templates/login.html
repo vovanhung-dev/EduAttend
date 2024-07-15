@@ -28,6 +28,7 @@
                 console.log(response.data.user); // Log the server response
 
                 if (response.data.user) {
+                    document.cookie = `user_id=${response.data.user.id}; path=/`;
                     localStorage.setItem('userData', JSON.stringify(response.data.user));
                     window.location.href = '/dashboard'; // Redirect to dashboard page
                 } else {

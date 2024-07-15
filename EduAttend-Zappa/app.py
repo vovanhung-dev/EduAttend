@@ -5,6 +5,7 @@ import os
 import tempfile
 from PIL import Image  # Import thư viện Image từ PIL
 import traceback
+from flask import session
 
 app = Flask(__name__)
 
@@ -33,10 +34,15 @@ temp_face_dir = tempfile.gettempdir()
 @app.route('/lich_thi', methods=['GET'])
 def get_lich_thi_list():
     try:
+        # Lấy user_id từ session
+        user_id = request.cookies.get('user_id')
+
+        print(user_id)
+
         with app.app_context():
             cur = mysql.connection.cursor()
 
-            # Truy vấn lấy danh sách các lịch thi
+            # Truy vấn lấy danh sách các lịch thi và các giám thị
             cur.execute('''
                 SELECT exams.exam_id AS ma_lich_thi, exams.date AS ngay, exams.subject AS mon_hoc, exams.room AS phong, 
                     exams.invigilator_1 AS giam_thi_1, exams.invigilator_2 AS giam_thi_2, 
@@ -45,9 +51,28 @@ def get_lich_thi_list():
             ''')
             lich_thi_list = cur.fetchall()
 
-            # Chuyển đổi kết quả truy vấn thành danh sách dictionary
-            columns = ['ma_lich_thi', 'ngay', 'mon_hoc', 'phong', 'giam_thi_1', 'giam_thi_2', 'giam_thi_3', 'giam_thi_4']
-            lich_thi_list_json = [dict(zip(columns, row)) for row in lich_thi_list]
+
+            # Lọc các giám thị trùng với user_id
+            lich_thi_list_json = []
+            for row in lich_thi_list:
+                exam = {
+                    'ma_lich_thi': row[0],
+                    'ngay': row[1],
+                    'mon_hoc': row[2],
+                    'phong': row[3],
+                    'giam_thi_1': row[4],
+                    'giam_thi_2': row[5],
+                    'giam_thi_3': row[6],
+                    'giam_thi_4': row[7]
+                }
+                print(exam)
+
+                for key in ['giam_thi_1', 'giam_thi_2', 'giam_thi_3', 'giam_thi_4']:
+                    if exam[key] is not None and int(exam[key]) == int(user_id):
+                        print("đã vô")
+                        lich_thi_list_json.append(exam)
+                        break
+
 
             cur.close()
 
