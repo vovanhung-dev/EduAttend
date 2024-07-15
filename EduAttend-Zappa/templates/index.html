@@ -6,7 +6,28 @@
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="../static/js/javascript.js"></script>
         <link href="../static/css/style.css" rel="stylesheet">
+        <script>
+            // JavaScript script in your HTML file
+            document.addEventListener('DOMContentLoaded', () => {
+                const userData = JSON.parse(localStorage.getItem('userData'));
 
+                // Update user info in the header
+                if (userData) {
+                    const userInfoElement = document.getElementById('userInfo');
+                    userInfoElement.textContent = `Xin chào, ${userData.username}`;
+                } else {
+                    // Redirect to login page or handle unauthorized access
+                    window.location.href = '/login'; // Redirect to login page if user data is not available
+                }
+
+                // Logout functionality
+                const logoutBtn = document.getElementById('logoutBtn');
+                logoutBtn.addEventListener('click', () => {
+                    localStorage.removeItem('userData'); // Remove user data from localStorage
+                    window.location.href = '/login'; // Redirect to login page after logout
+                });
+            });
+        </script>
         <title>Đăng ký</title>
     </head>
     <body>
@@ -19,6 +40,13 @@
                         height="50" width="50" style="border-radius: 50%;" />
                     <span class="ml-3 text-xl">EduAttend</span>
                 </a>
+                <nav
+                    class="md:ml-auto flex flex-wrap items-center text-base justify-center">
+                    <span id="userInfo" class="text-gray-300 mr-4"></span>
+                    <a id="logoutBtn" href="#"
+                        class="mr-5 inline-flex items-center bg-gray-800 border-0 py-1 px-3 focus:outline-none hover:bg-gray-700 rounded text-base mt-4 md:mt-0 text-white">Đăng
+                        xuất</a> <!-- Nút logout -->
+                </nav>
             </div>
         </header>
         <section class="text-gray-400 bg-gray-900 body-font">
@@ -105,51 +133,66 @@
         </section>
         <div class="text-center my-8">
             <label for="examSchedule">Chọn mã lịch thi:</label>
-            <select id="examSchedule" class="rounded-md px-4 py-2 bg-gray-800 text-white">
-                <option value="">Chọn mã lịch thi</option>
+            <select id="examSchedule"
+                class="rounded-md px-4 py-2 bg-gray-800 text-white">
+                <option value>Chọn mã lịch thi</option>
             </select>
-            <button onclick="getSelectedSchedule()" class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Xem chi tiết</button>
+            <button onclick="getSelectedSchedule()"
+                class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Xem
+                chi tiết</button>
         </div>
 
         <section class="text-gray-400 bg-gray-900 body-font my-2">
             <div id="result-2"></div>
         </section>
 
-        
         <section class="text-gray-400 bg-gray-900 body-font">
             <div class="container px-5 py-12 mx-auto text-center">
                 <!-- Nút chọn tùy chọn -->
-                <button onclick="showUploadOption()" class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Tải lên tệp</button>
-                <button onclick="showCameraOption()" class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Sử dụng camera</button>
+                <button onclick="showUploadOption()"
+                    class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Tải
+                    lên tệp</button>
+                <button onclick="showCameraOption()"
+                    class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Sử
+                    dụng camera</button>
             </div>
         </section>
-        
+
         <!-- Phần tải lên tệp -->
-        <section id="upload-file-section" class="text-gray-400 bg-gray-900 body-font hidden">
+        <section id="upload-file-section"
+            class="text-gray-400 bg-gray-900 body-font hidden">
             <div class="container px-5 py-12 mx-auto">
                 <form id="uploadForm" enctype="multipart/form-data">
                     <input type="file" name="file" id="fileInput">
-                    <button type="button" onclick="uploadImage()" class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Tải lên</button>
+                    <button type="button" onclick="uploadImage()"
+                        class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Tải
+                        lên</button>
                 </form>
             </div>
         </section>
-        
+
         <!-- Phần sử dụng camera -->
-        <section id="camera-section" class="text-gray-400 bg-gray-900 body-font hidden">
+        <section id="camera-section"
+            class="text-gray-400 bg-gray-900 body-font hidden">
             <div class="container px-5 py-12 mx-auto">
                 <div id="photo-container" class="mb-6"></div>
-                <button type="button" onclick="startCamera()" class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Bắt đầu camera</button>
-                <button type="button" onclick="takeSnapshot()" class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Chụp ảnh</button>
+                <button type="button" onclick="startCamera()"
+                    class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Bắt
+                    đầu camera</button>
+                <button type="button" onclick="takeSnapshot()"
+                    class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Chụp
+                    ảnh</button>
             </div>
         </section>
-        
+
         <section>
             <div id="loading" class="loading-spinner hidden"></div>
             <p id="loading-text" class="loading-text hidden"></p>
         </section>
-        
+
         <section class="text-gray-400 bg-gray-900 body-font">
-            <div id="result" class="flex items-center justify-center h-96"></div>
+            <div id="result"
+                class="flex items-center justify-center h-96"></div>
         </section>
 
         <footer class="text-gray-400 bg-gray-900 body-font">

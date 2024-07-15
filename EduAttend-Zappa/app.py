@@ -113,6 +113,14 @@ def get_lich_thi(ma_lich_thi):
 
 
 @app.route('/')
+def login():
+    return render_template('login.html')
+
+@app.route('/login')
+def login2():
+    return render_template('login.html')
+
+@app.route('/dashboard')
 def index():
     return render_template('index.html')
 
