@@ -11,31 +11,27 @@ const statisticsController = {
                 GROUP BY e.exam_id, e.subject
             `);
 
-            // Thống kê số lượng kỳ thi trong mỗi lớp
-            const [examsPerClass] = await db.execute(`
-                SELECT c.name AS class_name, COUNT(es.id) AS exam_count
-                FROM class c
-                LEFT JOIN exam_schedule es ON c.id = es.class_id
-                GROUP BY c.name
+            // Thống kê số lượng kỳ thi
+            const [examsCount] = await db.execute(`
+                SELECT COUNT(*) AS total_exams
+                FROM exams
             `);
 
-            // Thống kê số lượng học sinh trong mỗi lớp
-            const [studentsPerClass] = await db.execute(`
-                SELECT c.name AS class_name, COUNT(cu.user_id) AS student_count
-                FROM class c
-                LEFT JOIN class_users cu ON c.id = cu.class_id
-                GROUP BY c.name
+            // Thống kê số lượng tài khoản
+            const [accountsCount] = await db.execute(`
+                SELECT COUNT(*) AS total_accounts
+                FROM users
             `);
 
             // Trả về kết quả dưới dạng JSON
             res.status(200).json({
                 studentParticipation,
-                examsPerClass,
-                studentsPerClass
+                examsCount,
+                accountsCount
             });
         } catch (err) {
             console.error(err);
-            res.status(500).json({ message: 'Server error' });
+            res.status(500).json({ message: 'Lỗi server' });
         }
     }
 };

@@ -24,7 +24,7 @@ const DashBoard = () => {
             setLoading(true);
             try {
                 const response = await dashBoardApi.getAssetStatistics();
-                setStatistics(response);
+                setStatistics(response); 
             } catch (error) {
                 console.error('Lỗi khi tải thống kê tài sản:', error);
             } finally {
@@ -64,20 +64,24 @@ const DashBoard = () => {
                                     </Card>
                                 </Col>
                                 <Col span={8}>
-                                    <Card title="Số kỳ thi theo lớp">
-                                        {statistics.examsPerClass.map(item => (
-                                            <p key={item.class_name}>
-                                                {item.class_name}: {item.exam_count}
-                                            </p>
+                                    <Card title="Số kỳ thi">
+                                        {statistics.examsCount.map(item => (
+                                            <Statistic
+                                                key={item.total_exams}
+                                                title="Tổng số kỳ thi"
+                                                value={item.total_exams}
+                                            />
                                         ))}
                                     </Card>
                                 </Col>
                                 <Col span={8}>
-                                    <Card title="Số học sinh theo lớp">
-                                        {statistics.studentsPerClass.map(item => (
-                                            <p key={item.class_name}>
-                                                {item.class_name}: {item.student_count}
-                                            </p>
+                                    <Card title="Số tài khoản">
+                                        {statistics.accountsCount.map(item => (
+                                            <Statistic
+                                                key={item.total_accounts}
+                                                title="Tổng số tài khoản"
+                                                value={item.total_accounts}
+                                            />
                                         ))}
                                     </Card>
                                 </Col>
