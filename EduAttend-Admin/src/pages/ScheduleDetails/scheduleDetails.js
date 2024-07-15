@@ -56,38 +56,58 @@ const ScheduleDetails = () => {
     const handleOkUser = async (values) => {
         setLoading(true);
         try {
-
             console.log(values);
-
-            const categoryList = {
-                "examId": id,
-                "userId": values.students,
-            }
-            return axiosClient.post("/exam/addStudentToExamList", categoryList).then(response => {
-                if (response.message == "Student added to exam list successfully") {
-                    notification.success({
-                        message: 'Thông báo',
-                        description: 'Thêm sinh viên vào danh sách thi thành công',
-                    });
-                    setOpenModalCreate(false)
-                    handleCategoryList();
+            const examId = id; // Đảm bảo biến id được định nghĩa đúng
+    
+            // Duyệt qua từng sinh viên được chọn
+            const promises = values.students.map(studentId => {
+                const categoryList = {
+                    "examId": examId,
+                    "userId": studentId,
+                };
+                return axiosClient.post("/exam/addStudentToExamList", categoryList);
+            });
+    
+            // Chờ tất cả các lời hứa (promises) hoàn thành
+            const results = await Promise.all(promises);
+    
+            // Kiểm tra kết quả của từng API call
+            let successCount = 0;
+            let errorCount = 0;
+            results.forEach(response => {
+                if (response.message === "Student added to exam list successfully") {
+                    successCount++;
                 } else if (response && response.status === 400) {
+                    errorCount++;
                     notification.error({
                         message: 'Thông báo',
                         description: 'Sinh viên đã được gán cho kỳ thi này',
                     });
                 } else {
+                    errorCount++;
                     notification.error({
                         message: 'Thông báo',
                         description: 'Thêm sinh viên vào danh sách thi thất bại',
                     });
                 }
-                setLoading(false)
-            })
+            });
+    
+            if (successCount > 0) {
+                notification.success({
+                    message: 'Thông báo',
+                    description: `Thêm ${successCount} sinh viên vào danh sách thi thành công`,
+                });
+                setOpenModalCreate(false);
+                handleCategoryList();
+            }
+    
+            setLoading(false);
         } catch (error) {
-            throw error;
+            console.error('Error adding students to exam list:', error);
+            setLoading(false);
         }
-    }
+    };
+    
 
     const handleCancel = (type) => {
         if (type === "create") {
@@ -280,9 +300,9 @@ const ScheduleDetails = () => {
             console.error("No file selected.");
             return;
         }
-    
+
         setLoading(true);
-    
+
         const reader = new FileReader();
         reader.onload = async (e) => {
             const data = new Uint8Array(e.target.result);
@@ -290,7 +310,7 @@ const ScheduleDetails = () => {
             const firstSheet = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[firstSheet];
             const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-    
+
             try {
                 for (let i = 0; i < jsonData.length; i++) {
                     const row = jsonData[i];
@@ -298,9 +318,9 @@ const ScheduleDetails = () => {
                         examId: id, // Replace id with your exam id variable
                         userId: row[0], // Assuming the first column has student IDs
                     };
-    
+
                     const response = await axiosClient.post("/exam/addStudentToExamList", studentToAdd);
-    
+
                     if (response.status === 200) {
                         console.log(`Thêm sinh viên ${studentToAdd.userId} vào danh sách thi thành công`);
                         // Handle success notification or other actions
@@ -309,17 +329,17 @@ const ScheduleDetails = () => {
                         // Handle error notification or other actions
                     }
                 }
-    
+
                 // Notify overall success if needed
                 notification.success({
                     message: 'Thông báo',
                     description: 'Thêm sinh viên vào danh sách thi thành công',
                 });
-    
+
                 // Close modal or refresh data after all students are added
                 setOpenModalCreate(false);
                 handleCategoryList();
-    
+
             } catch (error) {
                 console.error('Thêm sinh viên vào danh sách thi thất bại:', error);
                 // Handle error notification or other actions
@@ -327,15 +347,15 @@ const ScheduleDetails = () => {
                     message: 'Thông báo',
                     description: 'Thêm sinh viên vào danh sách thi thất bại',
                 });
-    
+
             } finally {
                 setLoading(false);
             }
         };
-    
+
         reader.readAsArrayBuffer(uploadFile);
     };
-    
+
 
     return (
         <div>
@@ -436,6 +456,7 @@ const ScheduleDetails = () => {
                             >
                                 <Select
                                     placeholder="Chọn sinh viên"
+                                    mode="multiple" 
                                 >
                                     {studentList?.map((item) => (
                                         <Option key={item.id} value={item.id}>
@@ -444,6 +465,7 @@ const ScheduleDetails = () => {
                                     ))}
                                 </Select>
                             </Form.Item>
+
                         </Form>
                     </Spin>
                 </Modal>
