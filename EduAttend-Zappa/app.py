@@ -123,10 +123,10 @@ def get_users_for_exam(ma_lich_thi):
 
             # Truy vấn lấy danh sách user từ lịch thi
             cur.execute('''
-                SELECT user.ma_user, user.hoten, user.sdt, user.email
-                FROM user
-                INNER JOIN danh_sach_thi ON user.ma_user = danh_sach_thi.ma_user
-                WHERE danh_sach_thi.ma_lich_thi = %s
+                SELECT exam_list.user_id AS ma_user, users.username AS hoten, users.phone AS sdt, users.email, users.student_id
+                FROM exam_list
+                INNER JOIN users ON exam_list.user_id = users.id
+                WHERE exam_list.exam_id = %s
             ''', (ma_lich_thi,))
             users_data = cur.fetchall()
 
@@ -139,7 +139,8 @@ def get_users_for_exam(ma_lich_thi):
                     'ma_user': user[0],
                     'hoten': user[1],
                     'sdt': user[2],
-                    'email': user[3]
+                    'email': user[3],
+                    'student_id': user[4]
                 }
                 users_list.append(user_dict)
 
@@ -148,6 +149,7 @@ def get_users_for_exam(ma_lich_thi):
     except Exception as e:
         traceback.print_exc()
         return None
+
 
 @app.route('/compare', methods=['POST'])
 def compare_faces():
@@ -231,16 +233,16 @@ def compare_faces():
                     # Nếu tìm thấy khuôn mặt khớp
                     if len(compare_response['FaceMatches']) > 0:
 
-                        matched_face_name = os.path.splitext(os.path.basename(target_image_name))[0]
+                        matched_face_name = os.path.splitext(os.path.basename(target_image_name))[0].split('-')[0]
                         for user in users_data:
-                            if user['hoten'] == matched_face_name:  # Điều kiện so sánh có thể thay đổi tùy vào cách bạn lưu trữ
+                            if user['student_id'] == matched_face_name:  # Điều kiện so sánh có thể thay đổi tùy vào cách bạn lưu trữ
                                 # Cập nhật điểm danh thành True (1)
                                 with app.app_context():
                                     cur = mysql.connection.cursor()
                                     cur.execute('''
-                                        UPDATE danh_sach_thi
-                                        SET diem_danh = TRUE
-                                        WHERE ma_lich_thi = %s AND ma_user = %s
+                                        UPDATE exam_list
+                                        SET attendance = TRUE
+                                        WHERE exam_id = %s AND user_id = %s
                                     ''', (ma_lich_thi, user['ma_user']))
                                     mysql.connection.commit()
                                     cur.close()
