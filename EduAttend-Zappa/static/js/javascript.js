@@ -88,30 +88,44 @@ let videoStream = null;
 
 function startCamera() {
     const photoContainer = document.getElementById('photo-container');
-    photoContainer.innerHTML = '';
+    photoContainer.innerHTML = ''; // Xóa nội dung hiện có của photoContainer
+
     const constraints = {
-        video: true
+        video: { facingMode: 'environment' } // Chỉ sử dụng camera sau
     };
+
+    let video; // Biến video để lưu trữ element video
+    let canvas; // Biến canvas để lưu trữ element canvas
 
     navigator.mediaDevices.getUserMedia(constraints)
         .then(function (stream) {
             videoStream = stream;
-            const video = document.createElement('video');
+
+            video = document.createElement('video');
             video.setAttribute('autoplay', '');
             video.setAttribute('playsinline', '');
             video.setAttribute('id', 'camera');
             video.srcObject = stream;
-            document.getElementById('photo-container').appendChild(video);
 
-            const canvas = document.createElement('canvas');
+            canvas = document.createElement('canvas');
             canvas.setAttribute('id', 'canvas');
             canvas.style.display = 'none';
-            document.getElementById('photo-container').appendChild(canvas);
+
+            // Gọi hàm để thêm video và canvas sau khi đã được tạo
+            addVideoAndCanvasToContainer(video, canvas);
         })
         .catch(function (err) {
             console.error('Error accessing the camera: ', err);
         });
+
+    function addVideoAndCanvasToContainer(videoElement, canvasElement) {
+        // Thêm video và canvas vào photoContainer
+        photoContainer.appendChild(videoElement);
+        photoContainer.appendChild(canvasElement);
+    }
 }
+
+
 
 function takeSnapshot() {
     const video = document.getElementById('camera');
