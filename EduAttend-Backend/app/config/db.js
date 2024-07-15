@@ -1,10 +1,11 @@
 const mysql = require('mysql2/promise');
 
 const db = mysql.createPool({
-    host: 'localhost',
+    host: 'viaduct.proxy.rlwy.net',
     user: 'root',
-    password: 'root',
-    database: 'eduattend'
+    password: 'FlGyqbZzoEJeTCNjtkpMzILgkvVezmVw',
+    database: 'eduattend',
+    port: 21865
 });
 
 module.exports = db;

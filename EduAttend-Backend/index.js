@@ -14,10 +14,11 @@ require('./app/models/createTables');
 
 // Thay đổi kết nối cơ sở dữ liệu
 const db = mysql.createConnection({
-    host: 'localhost', 
+    host: 'viaduct.proxy.rlwy.net',
     user: 'root',
-    password: 'root',
-    database: 'eduattend'
+    password: 'FlGyqbZzoEJeTCNjtkpMzILgkvVezmVw',
+    database: 'eduattend',
+    port: 21865
 });
 
 db.connect((err) => {
