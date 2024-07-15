@@ -19,7 +19,7 @@ import {
     Space,
     Spin,
     Table,
-    Upload,
+    Popconfirm,
     Tag,
     notification
 } from 'antd';
@@ -134,11 +134,11 @@ const ScheduleDetails = () => {
         setLoading(true);
         try {
             const data = {
-                "classId": id,
+                "examId": Number(id),
                 "userId": userId,
             }
 
-            await examApi.deleteUserClass(data).then(response => {
+            await examApi.deleteStudentFromExamList(data).then(response => {
                 if (response === undefined) {
                     notification["error"]({
                         message: `Thông báo`,
@@ -213,28 +213,28 @@ const ScheduleDetails = () => {
                 </Tag>
             ),
         },
-        // {
-        //     title: 'Action',
-        //     key: 'action',
-        //     render: (text, record) => (
-        //         <div style={{ display: 'flex', flexDirection: 'column' }}>
-        //             <Popconfirm
-        //                 title="Bạn có chắc chắn xóa sinh viên này?"
-        //                 onConfirm={() => handleDeleteCategory(record.id)}
-        //                 okText="Yes"
-        //                 cancelText="No"
-        //             >
-        //                 <Button
-        //                     size="small"
-        //                     icon={<DeleteOutlined />}
-        //                     style={{ width: 150, borderRadius: 15, height: 30 }}
-        //                 >
-        //                     Xóa
-        //                 </Button>
-        //             </Popconfirm>
-        //         </div>
-        //     ),
-        // }
+        {
+            title: 'Action',
+            key: 'action',
+            render: (text, record) => (
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <Popconfirm
+                        title="Bạn có chắc chắn xóa sinh viên này?"
+                        onConfirm={() => handleDeleteCategory(record.id)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button
+                            size="small"
+                            icon={<DeleteOutlined />}
+                            style={{ width: 150, borderRadius: 15, height: 30 }}
+                        >
+                            Xóa
+                        </Button>
+                    </Popconfirm>
+                </div>
+            ),
+        }
     ];
 
 

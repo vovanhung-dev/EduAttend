@@ -53,6 +53,12 @@ const examApi = {
         const url = `/exam/exam_list/${examId}`;
         return axiosClient.get(url);
     },
+
+    deleteStudentFromExamList(data) {
+        const url = `/exam/deleteStudentFromExamList`;
+        return axiosClient.delete(url, { data });
+    },
 };
+
 
 export default examApi;

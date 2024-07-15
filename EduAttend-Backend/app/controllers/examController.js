@@ -30,6 +30,27 @@ const examController = {
         }
     },
 
+    deleteStudentFromExamList: async (req, res) => {
+       
+        const { examId, userId } = req.body;
+
+        try {
+            if (!Number.isInteger(examId) || !Number.isInteger(userId)) {
+                return res.status(400).json({ message: 'Invalid examId or userId' });
+            }
+
+            const deleteQuery = 'DELETE FROM exam_list WHERE exam_id = ? AND user_id = ?';
+            const [result] = await db.execute(deleteQuery, [examId, userId]);
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ message: 'Student not found in the exam list' });
+            }
+            res.status(200).json({ message: 'Student removed from exam list successfully' });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ message: 'Server error' });
+        }
+    },
+
     addStudentToExamList: async (req, res) => {
         const { examId, userId } = req.body;
         
