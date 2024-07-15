@@ -274,6 +274,7 @@ const ScheduleDetails = () => {
             'Họ và tên': item.username,
             'Môn thi': item.subject,
             'Phòng thi': item.room,
+            'Điểm danh': item.attendance === 1 ? 'Đã điểm danh' : 'Chưa điểm danh',
         }));
 
         // Call exportToExcel function from utils
