@@ -28,4 +28,6 @@ router.delete('/:id', examController.deleteExam);
 
 router.post('/addStudentToExamList', examController.addStudentToExamList);
 
+router.post('/addStudentToExamList2', examController.addStudentToExamList2);
+
 module.exports = router;

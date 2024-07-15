@@ -31,7 +31,7 @@ const examController = {
     },
 
     deleteStudentFromExamList: async (req, res) => {
-       
+
         const { examId, userId } = req.body;
 
         try {
@@ -53,7 +53,7 @@ const examController = {
 
     addStudentToExamList: async (req, res) => {
         const { examId, userId } = req.body;
-        
+
         try {
             // Check if the exam and user exist
             const examQuery = 'SELECT * FROM exams WHERE exam_id = ?';
@@ -86,6 +86,44 @@ const examController = {
         }
     },
 
+    addStudentToExamList2: async (req, res) => {
+        const { examId, studentId } = req.body;
+    
+        try {
+            // Check if the exam and student exist
+            const examQuery = 'SELECT * FROM exams WHERE exam_id = ?';
+            const [exam] = await db.execute(examQuery, [examId]);
+            if (exam.length === 0) {
+                return res.status(404).json({ message: 'Exam not found' });
+            }
+    
+            // Find the user_id associated with the student_id
+            const userQuery = 'SELECT id FROM users WHERE student_id = ?';
+            const [user] = await db.execute(userQuery, [studentId]);
+            if (user.length === 0) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+            const userId = user[0].id;
+    
+            // Check if the student is already in the exam list
+            const checkQuery = 'SELECT * FROM exam_list WHERE exam_id = ? AND user_id = ?';
+            const [existingStudent] = await db.execute(checkQuery, [examId, userId]);
+            if (existingStudent.length > 0) {
+                return res.status(400).json({ message: 'Student already assigned to the exam' });
+            }
+    
+            // Add student to exam_list
+            const insertQuery = 'INSERT INTO exam_list (exam_id, user_id) VALUES (?, ?)';
+            await db.execute(insertQuery, [examId, userId]);
+    
+            res.status(201).json({ message: 'Student added to exam list successfully' });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ message: 'Server error' });
+        }
+    },
+
+
     getExamById: async (req, res) => {
         const examId = req.params.id;
         try {
@@ -107,7 +145,7 @@ const examController = {
         try {
             let fields = [];
             let values = [];
-    
+
             if (date) {
                 fields.push('date');
                 values.push(date);
@@ -136,15 +174,15 @@ const examController = {
                 fields.push('invigilator_4');
                 values.push(invigilator_4);
             }
-    
+
             if (fields.length === 0) {
                 return res.status(400).json({ message: 'No valid fields provided for creating exam' });
             }
-    
+
             const placeholders = fields.map(() => '?').join(', ');
             const query = `INSERT INTO exams (${fields.join(', ')}) VALUES (${placeholders})`;
             const [result] = await db.execute(query, values);
-            
+
             const examId = result.insertId;
             res.status(201).json({ message: 'Exam created successfully', exam_id: examId });
         } catch (err) {
@@ -152,7 +190,7 @@ const examController = {
             res.status(500).json({ message: 'Server error' });
         }
     },
-    
+
     updateExam: async (req, res) => {
         const examId = req.params.id;
         const { date, subject, room, invigilator_1, invigilator_2, invigilator_3, invigilator_4 } = req.body;

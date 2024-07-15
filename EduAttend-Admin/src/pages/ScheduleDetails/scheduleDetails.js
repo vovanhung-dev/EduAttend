@@ -316,10 +316,10 @@ const ScheduleDetails = () => {
                     const row = jsonData[i];
                     const studentToAdd = {
                         examId: id, // Replace id with your exam id variable
-                        userId: row[0], // Assuming the first column has student IDs
+                        studentId: row[0], // Assuming the first column has student IDs
                     };
 
-                    const response = await axiosClient.post("/exam/addStudentToExamList", studentToAdd);
+                    const response = await axiosClient.post("/exam/addStudentToExamList2", studentToAdd);
 
                     if (response.status === 200) {
                         console.log(`Thêm sinh viên ${studentToAdd.userId} vào danh sách thi thành công`);
