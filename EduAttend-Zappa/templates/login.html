@@ -27,12 +27,12 @@
                 // Handle API response here
                 console.log(response.data.user); // Log the server response
 
-                if (response.data.user) {
+                if (response.data.user.role == "isTeacher") {
                     document.cookie = `user_id=${response.data.user.id}; path=/`;
                     localStorage.setItem('userData', JSON.stringify(response.data.user));
                     window.location.href = '/dashboard'; // Redirect to dashboard page
                 } else {
-                    alert('Login unsuccessful. Please try again.');
+                    alert('Email hoặc mật khẩu không chính xác. Hoặc bạn không có quyền truy cập. Vui lòng thử lại!');
                 }
 
             } catch (error) {
