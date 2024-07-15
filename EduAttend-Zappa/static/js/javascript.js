@@ -251,6 +251,7 @@ function getSelectedSchedule() {
                             <tr>
                                 <th scope="col" class="py-3 text-center text-xs font-medium uppercase tracking-wider">STT</th>
                                 <th scope="col" class="py-3 text-center text-xs font-medium uppercase tracking-wider">Họ và tên</th>
+                                <th scope="col" class="py-3 text-center text-xs font-medium uppercase tracking-wider">Mã sinh viên</th>
                                 <th scope="col" class="py-3 text-center text-xs font-medium uppercase tracking-wider">Điểm danh</th>
                             </tr>
                         </thead>
@@ -265,6 +266,7 @@ function getSelectedSchedule() {
                         <tr class="${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}">
                             <td class="py-4 whitespace-nowrap text-center">${index + 1}</td>
                             <td class="py-4 whitespace-nowrap">${candidate.hoten}</td>
+                            <td class="py-4 whitespace-nowrap">${candidate.student_id}</td>
                             <td class="py-4 whitespace-nowrap text-center">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${diemDanhClass}">${diemDanhText}</span>
                             </td>
@@ -288,3 +290,4 @@ function getSelectedSchedule() {
         alert('Vui lòng chọn mã lịch thi trước khi xem chi tiết.');
     }
 }
+

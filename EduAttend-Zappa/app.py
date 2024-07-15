@@ -8,11 +8,11 @@ import traceback
 
 app = Flask(__name__)
 
-app.config['MYSQL_HOST'] = 'viaduct.proxy.rlwy.net'
+app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'FlGyqbZzoEJeTCNjtkpMzILgkvVezmVw'
-app.config['MYSQL_DB'] = 'eduattend-v2'
-app.config['MYSQL_PORT'] = 21865
+app.config['MYSQL_PASSWORD'] = 'root'
+app.config['MYSQL_DB'] = 'eduattend'
+app.config['MYSQL_PORT'] = 3306
 
 mysql = MySQL(app)
 
@@ -28,58 +28,6 @@ s3_client = boto3.client('s3',
 # Đường dẫn tạm thời để lưu trữ các khuôn mặt được nhận dạng
 temp_face_dir = tempfile.gettempdir()
 
-# Hàm tạo bảng nếu chưa tồn tại
-def create_tables():
-    with app.app_context():
-        cur = mysql.connection.cursor()
-
-        # Tạo bảng user
-        cur.execute('''
-            CREATE TABLE IF NOT EXISTS user (
-                ma_user INT PRIMARY KEY AUTO_INCREMENT,
-                hoten VARCHAR(255) NOT NULL,
-                sdt VARCHAR(15) UNIQUE NOT NULL,
-                email VARCHAR(255) UNIQUE NOT NULL,
-                mat_khau VARCHAR(255) NOT NULL,
-                vai_tro ENUM('student', 'teacher', 'admin') NOT NULL,
-                lop VARCHAR(50)
-            )
-        ''')
-
-        # Tạo bảng lich_thi
-        cur.execute('''
-            CREATE TABLE IF NOT EXISTS lich_thi (
-                ma_lich_thi INT PRIMARY KEY AUTO_INCREMENT,
-                ngay DATE NOT NULL,
-                mon_hoc VARCHAR(100) NOT NULL,
-                phong VARCHAR(50) NOT NULL,
-                giam_thi_1 INT NOT NULL,
-                giam_thi_2 INT NOT NULL,
-                giam_thi_3 INT,
-                giam_thi_4 INT,
-                FOREIGN KEY (giam_thi_1) REFERENCES user(ma_user),
-                FOREIGN KEY (giam_thi_2) REFERENCES user(ma_user),
-                FOREIGN KEY (giam_thi_3) REFERENCES user(ma_user),
-                FOREIGN KEY (giam_thi_4) REFERENCES user(ma_user)
-            )
-        ''')
-
-        # Tạo bảng danh_sach_thi
-        cur.execute('''
-            CREATE TABLE IF NOT EXISTS danh_sach_thi (
-                ma_lich_thi INT,
-                ma_user INT,
-                diem_danh BOOLEAN DEFAULT FALSE,
-                PRIMARY KEY (ma_lich_thi, ma_user),
-                FOREIGN KEY (ma_lich_thi) REFERENCES lich_thi(ma_lich_thi),
-                FOREIGN KEY (ma_user) REFERENCES user(ma_user)
-            )
-        ''')
-
-        # Commit thay đổi và đóng kết nối
-        mysql.connection.commit()
-        cur.close()
-
 # Route để lấy danh sách các lịch thi
 
 @app.route('/lich_thi', methods=['GET'])
@@ -90,7 +38,10 @@ def get_lich_thi_list():
 
             # Truy vấn lấy danh sách các lịch thi
             cur.execute('''
-                SELECT ma_lich_thi, ngay, mon_hoc, phong, giam_thi_1, giam_thi_2, giam_thi_3, giam_thi_4 FROM lich_thi
+                SELECT exams.exam_id AS ma_lich_thi, exams.date AS ngay, exams.subject AS mon_hoc, exams.room AS phong, 
+                    exams.invigilator_1 AS giam_thi_1, exams.invigilator_2 AS giam_thi_2, 
+                    exams.invigilator_3 AS giam_thi_3, exams.invigilator_4 AS giam_thi_4
+                FROM exams
             ''')
             lich_thi_list = cur.fetchall()
 
@@ -115,16 +66,15 @@ def get_lich_thi(ma_lich_thi):
 
             # Truy vấn lấy thông tin lịch thi và tên giám thị
             cur.execute('''
-               SELECT lich_thi.ma_lich_thi, lich_thi.ngay, lich_thi.mon_hoc, lich_thi.phong, 
-                    user_1.hoten AS giam_thi_1, user_2.hoten AS giam_thi_2, 
-                    user_3.hoten AS giam_thi_3, user_4.hoten AS giam_thi_4
-                FROM lich_thi
-                LEFT JOIN user AS user_1 ON lich_thi.giam_thi_1 = user_1.ma_user
-                LEFT JOIN user AS user_2 ON lich_thi.giam_thi_2 = user_2.ma_user
-                LEFT JOIN user AS user_3 ON lich_thi.giam_thi_3 = user_3.ma_user
-                LEFT JOIN user AS user_4 ON lich_thi.giam_thi_4 = user_4.ma_user
-                WHERE lich_thi.ma_lich_thi = %s
-
+               SELECT exams.exam_id AS ma_lich_thi, exams.date AS ngay, exams.subject AS mon_hoc, exams.room AS phong, 
+                    user_1.username AS giam_thi_1, user_2.username AS giam_thi_2, 
+                    user_3.username AS giam_thi_3, user_4.username AS giam_thi_4
+                FROM exams
+                LEFT JOIN users AS user_1 ON exams.invigilator_1 = user_1.id
+                LEFT JOIN users AS user_2 ON exams.invigilator_2 = user_2.id
+                LEFT JOIN users AS user_3 ON exams.invigilator_3 = user_3.id
+                LEFT JOIN users AS user_4 ON exams.invigilator_4 = user_4.id
+                WHERE exams.exam_id = %s
             ''', (ma_lich_thi,))
             lich_thi_data = cur.fetchone()
 
@@ -135,17 +85,18 @@ def get_lich_thi(ma_lich_thi):
             lich_thi_columns = ['ma_lich_thi', 'ngay', 'mon_hoc', 'phong', 'giam_thi_1', 'giam_thi_2', 'giam_thi_3', 'giam_thi_4']
             lich_thi_data_json = dict(zip(lich_thi_columns, lich_thi_data))
 
-            # Truy vấn lấy danh sách user tham gia thi
+           # Truy vấn lấy danh sách user tham gia thi với thêm trường student_id
             cur.execute('''
-                SELECT user.ma_user, user.hoten, danh_sach_thi.diem_danh
-                FROM user
-                INNER JOIN danh_sach_thi ON user.ma_user = danh_sach_thi.ma_user
-                WHERE danh_sach_thi.ma_lich_thi = %s
+                SELECT exam_list.user_id AS ma_user, users.username AS hoten, users.student_id, exam_list.attendance AS diem_danh
+                FROM exam_list
+                INNER JOIN users ON exam_list.user_id = users.id
+                WHERE exam_list.exam_id = %s
             ''', (ma_lich_thi,))
             users_data = cur.fetchall()
 
-            # Chuyển đổi dữ liệu danh sách thi thành danh sách dictionary
-            user_columns = ['ma_user', 'hoten', 'diem_danh']
+
+           # Chuyển đổi dữ liệu danh sách thi thành danh sách dictionary với student_id
+            user_columns = ['ma_user', 'hoten', 'student_id', 'diem_danh']
             users_data_json = [dict(zip(user_columns, row)) for row in users_data]
 
             cur.close()
@@ -158,6 +109,7 @@ def get_lich_thi(ma_lich_thi):
     except Exception as e:
         traceback.print_exc()
         return jsonify({'error': str(e)})
+
 
 
 @app.route('/')
@@ -316,5 +268,4 @@ def compare_faces():
         return jsonify({'error': str(e)})
 
 if __name__ == '__main__':
-    create_tables()
     app.run(debug=True)
