@@ -1,59 +1,43 @@
 import {
-    ContactsTwoTone,
     DashboardOutlined,
-    EnvironmentTwoTone,
-    HomeOutlined,
-    NotificationTwoTone,
-    ProfileTwoTone
+    HomeOutlined
 } from '@ant-design/icons';
 import {
     BackTop,
     Breadcrumb,
-    Card,
-    Col,
+    Spin,
+    Statistic,
     Row,
-    Spin
+    Col,
+    Card
 } from 'antd';
 import React, { useEffect, useState } from 'react';
-import userApi from '../../apis/userApi';
+import dashBoardApi from '../../apis/dashBoardApi';
 import "./dashBoard.css";
 
-
 const DashBoard = () => {
-    const [statisticList, setStatisticList] = useState([]);
-    const [totalResult, setTotalResult] = useState([]);
-    const [service, setService] = useState([]);
-    const [booking, setBooking] = useState([]);
-
-    const [loading, setLoading] = useState(true);
-    const [total, setTotalList] = useState();
-    const [area, setArea] = useState(null);
-    const [userData, setUserData] = useState([]);
-
+    const [loading, setLoading] = useState(false);
+    const [statistics, setStatistics] = useState(null);
 
     useEffect(() => {
-        (async () => {
+        const fetchStatistics = async () => {
+            setLoading(true);
             try {
-
-                const response = await userApi.getProfile();
-                console.log(response);
-                setUserData(response.user);
-                await userApi.listUserByAdmin().then((res) => {
-                    console.log(res);
-                    setStatisticList(res.data);
-                    setLoading(false);
-                });
-
-
-
+                const response = await dashBoardApi.getAssetStatistics();
+                setStatistics(response);
             } catch (error) {
-                console.log('Failed to fetch event list:' + error);
+                console.error('Lỗi khi tải thống kê tài sản:', error);
+            } finally {
+                setLoading(false);
             }
-        })();
-    }, [])
+        };
+
+        fetchStatistics();
+    }, []);
+
     return (
         <div>
-            <Spin spinning={false}>
+            <Spin spinning={loading}>
                 <div className='container'>
                     <div style={{ marginTop: 20 }}>
                         <Breadcrumb>
@@ -62,73 +46,48 @@ const DashBoard = () => {
                             </Breadcrumb.Item>
                             <Breadcrumb.Item href="">
                                 <DashboardOutlined />
-                                <span>DashBoard</span>
+                                <span>Bảng thống kê</span>
                             </Breadcrumb.Item>
                         </Breadcrumb>
                     </div>
-                        {/* <Row gutter={12} style={{ marginTop: 20 }}>
-                            <Col span={6}>
-                                <Card className="card_total" bordered={false}>
-                                    <div className='card_number'>
-                                        <div>
-                                            <div className='number_total'>{statisticList?.length || 0}</div>
-                                            <div className='title_total'>Số thành viên</div>
-                                        </div>
-                                        <div>
-                                            <ContactsTwoTone style={{ fontSize: 48 }} />
-                                        </div>
-                                    </div>
-                                </Card>
-                            </Col>
-                            <Col span={6}>
-                                <Card className="card_total" bordered={false}>
-                                    <div className='card_number'>
-                                        <div>
-                                            <div className='number_total'>{total?.length || 0}</div>
-                                            <div className='title_total'>Tổng sinh viên</div>
-                                        </div>
-                                        <div>
-                                            <NotificationTwoTone style={{ fontSize: 48 }} />
-                                        </div>
-                                    </div>
-                                </Card>
-                            </Col>
-
-                            <Col span={6}>
-                                <Card className="card_total" bordered={false}>
-                                    <div className='card_number'>
-                                        <div>
-                                            <div className='number_total'>{area?.length || 0}</div>
-                                            <div className='title_total'>Tổng số lớp</div>
-                                        </div>
-                                        <div>
-                                            <EnvironmentTwoTone style={{ fontSize: 48 }} />
-                                        </div>
-                                    </div>
-                                </Card>
-                            </Col>
-
-                            
-                            <Col span={6}>
-                                <Card className="card_total" bordered={false}>
-                                    <div className='card_number'>
-                                        <div>
-                                            <div className='number_total'>{service?.length || 0}</div>
-                                            <div className='title_total'>Tổng lịch thi</div>
-                                        </div>
-                                        <div>
-                                            <ProfileTwoTone style={{ fontSize: 48 }} />
-                                        </div>
-                                    </div>
-                                </Card>
-                            </Col>
-
-                            
-                        </Row> */}
+                    
+                    <Row gutter={16} style={{ marginTop: 20 }}>
+                        {statistics && (
+                            <>
+                                <Col span={8}>
+                                    <Card title="Tham gia của học sinh">
+                                        {statistics.studentParticipation.map(item => (
+                                            <p key={item.exam_id}>
+                                                {item.subject}: {item.student_count}
+                                            </p>
+                                        ))}
+                                    </Card>
+                                </Col>
+                                <Col span={8}>
+                                    <Card title="Số kỳ thi theo lớp">
+                                        {statistics.examsPerClass.map(item => (
+                                            <p key={item.class_name}>
+                                                {item.class_name}: {item.exam_count}
+                                            </p>
+                                        ))}
+                                    </Card>
+                                </Col>
+                                <Col span={8}>
+                                    <Card title="Số học sinh theo lớp">
+                                        {statistics.studentsPerClass.map(item => (
+                                            <p key={item.class_name}>
+                                                {item.class_name}: {item.student_count}
+                                            </p>
+                                        ))}
+                                    </Card>
+                                </Col>
+                            </>
+                        )}
+                    </Row>
                 </div>
                 <BackTop style={{ textAlign: 'right' }} />
             </Spin>
-        </div >
+        </div>
     )
 }
 

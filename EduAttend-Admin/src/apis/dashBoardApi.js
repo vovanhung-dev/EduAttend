@@ -2,7 +2,7 @@ import axiosClient from "./axiosClient";
 
 const dashBoardApi = {
     async getAssetStatistics() {
-        const url = `dashboard/statistics`;
+        const url = `/statistics/all`;
         try {
             const response = await axiosClient.get(url);
             return response;
