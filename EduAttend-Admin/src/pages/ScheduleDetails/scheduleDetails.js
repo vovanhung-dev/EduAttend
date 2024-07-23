@@ -58,7 +58,7 @@ const ScheduleDetails = () => {
         try {
             console.log(values);
             const examId = id; // Đảm bảo biến id được định nghĩa đúng
-    
+
             // Duyệt qua từng sinh viên được chọn
             const promises = values.students.map(studentId => {
                 const categoryList = {
@@ -67,10 +67,10 @@ const ScheduleDetails = () => {
                 };
                 return axiosClient.post("/exam/addStudentToExamList", categoryList);
             });
-    
+
             // Chờ tất cả các lời hứa (promises) hoàn thành
             const results = await Promise.all(promises);
-    
+
             // Kiểm tra kết quả của từng API call
             let successCount = 0;
             let errorCount = 0;
@@ -91,7 +91,7 @@ const ScheduleDetails = () => {
                     });
                 }
             });
-    
+
             if (successCount > 0) {
                 notification.success({
                     message: 'Thông báo',
@@ -100,14 +100,14 @@ const ScheduleDetails = () => {
                 setOpenModalCreate(false);
                 handleCategoryList();
             }
-    
+
             setLoading(false);
         } catch (error) {
             console.error('Error adding students to exam list:', error);
             setLoading(false);
         }
     };
-    
+
 
     const handleCancel = (type) => {
         if (type === "create") {
@@ -457,7 +457,12 @@ const ScheduleDetails = () => {
                             >
                                 <Select
                                     placeholder="Chọn sinh viên"
-                                    mode="multiple" 
+                                    mode="multiple"
+                                    optionFilterProp="children"
+                                    filterOption={(input, option) =>
+                                        option.children.toLowerCase().includes(input.toLowerCase()) ||
+                                        option.value.toString().includes(input)
+                                    }
                                 >
                                     {studentList?.map((item) => (
                                         <Option key={item.id} value={item.id}>
