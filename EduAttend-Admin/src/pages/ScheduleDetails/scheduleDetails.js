@@ -446,7 +446,7 @@ const ScheduleDetails = () => {
 
                             <Form.Item
                                 name="students"
-                                label="Tiện ích"
+                                label="Chọn sinh viên"
                                 rules={[
                                     {
                                         required: true,

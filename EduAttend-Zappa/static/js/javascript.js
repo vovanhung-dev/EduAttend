@@ -51,11 +51,22 @@ function uploadImage() {
                 loadingText.style.display = 'none';
                 console.log(data);
 
+                let resultElement = document.getElementById('result');
+                resultElement.innerHTML = '';
+
                 if (data.match) {
                     // Hiển thị thông báo đã điểm danh thành công
-                    let resultElement = document.getElementById('result');
-                    resultElement.innerHTML = '<p>Đã điểm danh thành công. Vui lòng chạy lại trang web để xem danh sách sinh viên đã điểm danh!</p>';
+                    data.attended_students.forEach(student => {
+                        let studentElement = document.createElement('p');
+                        studentElement.innerText = `Sinh viên ${student.hoten} (${student.student_id}) đã được điểm danh.`;
+                        studentElement.classList.add('text-xl', 'text-white', 'p-2');
+                        resultElement.appendChild(studentElement);
+                    });
 
+                    let successMessage = document.createElement('p');
+                    successMessage.innerText = 'Đã điểm danh thành công. Vui lòng chạy lại trang web để xem danh sách sinh viên đã điểm danh!';
+                    successMessage.classList.add('text-xl', 'text-white', 'p-8');
+                    resultElement.appendChild(successMessage);
 
                 } else {
                     // Nếu không tìm thấy kết quả nào
@@ -83,6 +94,7 @@ function uploadImage() {
         // Xử lý khi có lỗi
     };
 }
+
 
 let videoStream = null;
 

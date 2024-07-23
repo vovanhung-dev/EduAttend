@@ -223,6 +223,7 @@ def compare_faces():
 
         # Danh sách các kết quả so sánh khuôn mặt khớp
         matched_faces = []
+        attended_students = []
 
         # Nếu có các khuôn mặt được nhận dạng
         for face_detail in detected_faces:
@@ -265,7 +266,6 @@ def compare_faces():
 
                     # Nếu tìm thấy khuôn mặt khớp
                     if len(compare_response['FaceMatches']) > 0:
-
                         matched_face_name = os.path.splitext(os.path.basename(target_image_name))[0].split('-')[0]
                         for user in users_data:
                             if user['student_id'] == matched_face_name:  # Điều kiện so sánh có thể thay đổi tùy vào cách bạn lưu trữ
@@ -279,6 +279,9 @@ def compare_faces():
                                     ''', (ma_lich_thi, user['ma_user']))
                                     mysql.connection.commit()
                                     cur.close()
+
+                                # Thêm thông tin sinh viên vào danh sách đã điểm danh
+                                attended_students.append(user)
 
                         # Tạo URL công khai cho ảnh từ S3
                         presigned_url = s3_client.generate_presigned_url(
@@ -295,8 +298,12 @@ def compare_faces():
                             'similarity': compare_response['FaceMatches'][0]['Similarity']
                         })
 
-        # Trả về kết quả các khuôn mặt khớp được tìm thấy
-        return jsonify({'match': True, 'matched_faces': matched_faces})
+        # Trả về kết quả các khuôn mặt khớp được tìm thấy cùng danh sách sinh viên đã điểm danh
+        return jsonify({'match': True, 'matched_faces': matched_faces, 'attended_students': attended_students})
+
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)})
 
     except Exception as e:
         traceback.print_exc()
