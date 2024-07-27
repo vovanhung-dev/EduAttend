@@ -9,11 +9,11 @@ from flask import session
 
 app = Flask(__name__)
 
-app.config['MYSQL_HOST'] = 'viaduct.proxy.rlwy.net'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'FlGyqbZzoEJeTCNjtkpMzILgkvVezmVw'
+app.config['MYSQL_HOST'] = 'database-1.cpqwqaawsjr7.ap-southeast-2.rds.amazonaws.com'
+app.config['MYSQL_USER'] = 'admin'
+app.config['MYSQL_PASSWORD'] = 'Vovanhung77h'
 app.config['MYSQL_DB'] = 'eduattend'
-app.config['MYSQL_PORT'] = 21865
+app.config['MYSQL_PORT'] = 3306
 
 mysql = MySQL(app)
 
