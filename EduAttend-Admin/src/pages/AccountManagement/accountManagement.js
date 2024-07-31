@@ -119,45 +119,126 @@ const AccountManagement = () => {
             key: 'action',
             render: (text, record) => (
                 <div>
-                    <Row>
-                        {record.status !== "actived" ? <Popconfirm
-                            title="Bạn muốn mở chặn tài khoản này?"
-                            onConfirm={() => handleUnBanAccount(record)}
-                            okText="Yes"
-                            cancelText="No"
+                    <Row style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                        {record.status !== "actived" ? 
+                            <Popconfirm
+                                title="Bạn muốn mở chặn tài khoản này?"
+                                onConfirm={() => handleUnBanAccount(record)}
+                                okText="Yes"
+                                cancelText="No"
+                            >
+                                <Button
+                                    size="small"
+                                    icon={<CheckCircleOutlined />}
+                                    style={{ width: 160, borderRadius: 15, height: 30, marginBottom: 6 }}
+                                >
+                                    Mở chặn tài khoản
+                                </Button>
+                            </Popconfirm> 
+                            : 
+                            <Popconfirm
+                                title="Bạn muốn chặn tài khoản này?"
+                                onConfirm={() => handleBanAccount(record)}
+                                okText="Yes"
+                                cancelText="No"
+                            >
+                                <Button
+                                    size="small"
+                                    icon={<StopOutlined />}
+                                    style={{ width: 160, borderRadius: 15, height: 30, marginBottom: 6 }}
+                                >
+                                    Chặn tài khoản
+                                </Button>
+                            </Popconfirm>
+                        }
+                        <Button 
+                            size="small" 
+                            icon={<CheckCircleOutlined />} 
+                            style={{ width: 160, borderRadius: 15, height: 30, marginBottom: 6 }} 
+                            onClick={() => showChangeRoleModal(record)}
                         >
-                            <Button
-                                size="small"
-                                icon={<CheckCircleOutlined />}
-                                style={{ width: 160, borderRadius: 15, height: 30 }}
-                            >{"Mở chặn tài khoản"}
-                            </Button>
-                        </Popconfirm> : <Popconfirm
-                            title="Bạn muốn chặn tài khoản này?"
-                            onConfirm={() => handleBanAccount(record)}
+                            Thay đổi quyền
+                        </Button>
+                        <Button 
+                            size="small" 
+                            icon={<UserOutlined />} 
+                            style={{ width: 160, borderRadius: 15, height: 30, marginBottom: 6 }} 
+                            onClick={() => showEditModal(record)}
+                        >
+                            Sửa
+                        </Button>
+                        <Popconfirm
+                            title="Bạn muốn xóa tài khoản này?"
+                            onConfirm={() => handleDeleteAccount(record)}
                             okText="Yes"
                             cancelText="No"
                         >
                             <Button
                                 size="small"
                                 icon={<StopOutlined />}
-                                style={{ width: 160, borderRadius: 15, height: 30 }}
-                            >{"Chặn tài khoản"}
+                                style={{ width: 160, borderRadius: 15, height: 30, marginBottom: 6 }}
+                            >
+                                Xóa
                             </Button>
-                        </Popconfirm>}
-                        <Button size="small" icon={<CheckCircleOutlined />} style={{ width: 160, borderRadius: 15, height: 30, marginTop: 6 }} onClick={() => showChangeRoleModal(record)}>
-                            Thay đổi quyền
-                        </Button>
+                        </Popconfirm>
                     </Row>
-
-                </div >
+                </div>
             ),
-        },
+        }
+        
     ];
+
+    const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [form2] = Form.useForm();
+
+    const showEditModal = (record) => {
+        setSelectedUser(record);
+        form2.setFieldsValue(record);
+        setIsEditModalVisible(true);
+    };
+
+    const handleEditOk = async () => {
+        try {
+            const values = await form2.validateFields();
+            const updatedUser = { ...selectedUser, ...values };
+            await userApi.updateUser(updatedUser.id, updatedUser);
+            notification["success"]({
+                message: `Thông báo`,
+                description: 'Cập nhật tài khoản thành công',
+            });
+            handleListUser();
+            setIsEditModalVisible(false);
+        } catch (error) {
+            notification["error"]({
+                message: `Thông báo`,
+                description: 'Cập nhật tài khoản thất bại',
+            });
+        }
+    };
+
+    const handleEditCancel = () => {
+        setIsEditModalVisible(false);
+    };
+
+    const handleDeleteAccount = async (record) => {
+        try {
+            await userApi.deleteUser(record.id);
+            notification["success"]({
+                message: `Thông báo`,
+                description: 'Xóa tài khoản thành công',
+            });
+            handleListUser();
+        } catch (error) {
+            notification["error"]({
+                message: `Thông báo`,
+                description: 'Xóa tài khoản thất bại',
+            });
+        }
+    };
 
     const [isModalVisible2, setIsModalVisible2] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState(null);
-    const [form2] = Form.useForm();
 
     const showChangeRoleModal = (record) => {
         setSelectedRecord(record);
@@ -601,6 +682,56 @@ const AccountManagement = () => {
                         </Form.Item>
                     </Form>
                 </Modal>
+
+                <Modal
+                    title="Sửa tài khoản"
+                    visible={isEditModalVisible}
+                    onOk={handleEditOk}
+                    onCancel={handleEditCancel}
+                >
+                    <Form form={form2} layout="vertical" initialValues={selectedUser}>
+                        <Form.Item
+                            name="username"
+                            label="Tên đăng nhập"
+                            rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}
+                        >
+                            <Input />
+                        </Form.Item>
+                        <Form.Item
+                            name="email"
+                            label="Email"
+                            rules={[{ required: true, message: 'Vui lòng nhập email!' }]}
+                        >
+                            <Input />
+                        </Form.Item>
+                        <Form.Item
+                            name="phone"
+                            label="Số điện thoại"
+                            rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}
+                        >
+                            <Input />
+                        </Form.Item>
+                        <Form.Item
+                            name="role"
+                            label="Phân quyền"
+                            rules={[{ required: true, message: 'Vui lòng chọn phân quyền!' }]}
+                        >
+                            <Select>
+                                <Option value="isAdmin">Admin</Option>
+                                <Option value="isStudent">Sinh viên</Option>
+                                <Option value="isTeacher">Giảng viên</Option>
+                            </Select>
+                        </Form.Item>
+                        <Form.Item
+                            name="student_id"
+                            label="Mã số người dùng"
+                            rules={[{ required: true, message: 'Vui lòng nhập mã số sinh viên!' }]}
+                        >
+                            <Input />
+                        </Form.Item>
+                    </Form>
+                </Modal>
+
                 <BackTop style={{ textAlign: 'right' }} />
             </Spin>
         </div>

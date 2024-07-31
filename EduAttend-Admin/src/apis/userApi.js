@@ -83,8 +83,17 @@ const userApi = {
     listNotification() {
         const url = '/notifications';
         return axiosClient.get(url);
-    }
+    },
 
+    updateUser(id, data) {
+        const url = `/user/${id}`;
+        return axiosClient.put(url, data);
+    },
+
+    deleteUser(id) {
+        const url = `/user/${id}`;
+        return axiosClient.delete(url);
+    }
 }
 
 export default userApi;
