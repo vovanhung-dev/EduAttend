@@ -246,7 +246,6 @@ function showLoading() {
     document.getElementById('loading-text').innerText = 'Đang tải...';
 }
 
-// Function to get selected schedule
 function getSelectedSchedule() {
     const selectedScheduleId = document.getElementById('examSchedule').value;
     if (selectedScheduleId) {
@@ -279,14 +278,26 @@ function getSelectedSchedule() {
                                 <th scope="col" class="py-3 text-center text-xs font-medium uppercase tracking-wider">Họ và tên</th>
                                 <th scope="col" class="py-3 text-center text-xs font-medium uppercase tracking-wider">Mã sinh viên</th>
                                 <th scope="col" class="py-3 text-center text-xs font-medium uppercase tracking-wider">Điểm danh</th>
+                                <th scope="col" class="py-3 text-center text-xs font-medium uppercase tracking-wider">Trạng thái</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">`;
 
                 // Loop through danh_sach_thi (candidates list)
                 data.danh_sach_thi.forEach((candidate, index) => {
-                    const diemDanhText = candidate.diem_danh === 1 ? 'Đã điểm danh' : 'Chưa điểm danh';
-                    const diemDanhClass = candidate.diem_danh === 1 ? 'bg-green-500 text-white' : 'bg-red-500 text-white';
+                    const diemDanhText = {
+                        1: 'Đã điểm danh',
+                        0: 'Chưa điểm danh',
+                        2: 'Chưa nhận dạng được',
+                        3: 'Sinh viên cho thi hộ'
+                    }[candidate.diem_danh] || 'Chưa điểm danh';
+
+                    const diemDanhClass = {
+                        1: 'bg-green-500 text-white',
+                        0: 'bg-red-500 text-white',
+                        2: 'bg-yellow-500 text-white',
+                        3: 'bg-purple-500 text-white'
+                    }[candidate.diem_danh] || 'bg-red-500 text-white';
 
                     html += `
                         <tr class="${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}">
@@ -295,6 +306,15 @@ function getSelectedSchedule() {
                             <td class="py-4 whitespace-nowrap">${candidate.student_id}</td>
                             <td class="py-4 whitespace-nowrap text-center">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${diemDanhClass}">${diemDanhText}</span>
+                            </td>
+                           <td class="py-4 whitespace-nowrap text-center">
+                                <select class="attendance-status px-2 py-1 bg-gray-800 text-white rounded" data-exam-id="${selectedScheduleId}" data-user-id="${candidate.ma_user}">
+                                    <option value="1" ${candidate.diem_danh === 1 ? 'selected' : ''}>Đã điểm danh</option>
+                                    <option value="0" ${candidate.diem_danh === 0 ? 'selected' : ''}>Chưa điểm danh</option>
+                                    <option value="2" ${candidate.diem_danh === 2 ? 'selected' : ''}>Chưa nhận dạng được</option>
+                                    <option value="3" ${candidate.diem_danh === 3 ? 'selected' : ''}>Sinh viên cho thi hộ</option>
+                                </select>
+                                <button class="update-button px-3 py-1 mt-1 ml-2 bg-blue-600 text-white rounded" onclick="updateAttendanceStatus(${selectedScheduleId}, ${candidate.ma_user})">Cập nhật</button>
                             </td>
                         </tr>`;
                 });
@@ -317,3 +337,28 @@ function getSelectedSchedule() {
     }
 }
 
+function updateAttendanceStatus(examId, userId) {
+    const selectElement = document.querySelector(`select[data-exam-id="${examId}"][data-user-id="${userId}"]`);
+    const newStatus = selectElement.value;
+
+    fetch('/update_attendance', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            exam_id: examId,
+            user_id: userId,
+            new_status: newStatus
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Trạng thái điểm danh đã được cập nhật');
+        } else {
+            alert('Có lỗi xảy ra khi cập nhật trạng thái điểm danh');
+        }
+    })
+    .catch(error => console.error('Error updating attendance status:', error));
+}

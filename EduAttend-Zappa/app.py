@@ -135,6 +135,32 @@ def get_lich_thi(ma_lich_thi):
         traceback.print_exc()
         return jsonify({'error': str(e)})
 
+@app.route('/update_attendance', methods=['POST'])
+def update_attendance():
+    try:
+        data = request.get_json()
+        exam_id = data.get('exam_id')
+        user_id = data.get('user_id')
+        new_status = data.get('new_status')
+
+        if not exam_id or not user_id or new_status is None:
+            return jsonify({'error': 'Exam ID, User ID and new status are required'}), 400
+
+        with app.app_context():
+            cur = mysql.connection.cursor()
+            cur.execute('''
+                UPDATE exam_list
+                SET attendance = %s
+                WHERE exam_id = %s AND user_id = %s
+            ''', (new_status, exam_id, user_id))
+            mysql.connection.commit()
+            cur.close()
+
+        return jsonify({'success': True, 'message': 'Attendance status updated successfully'})
+
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)})
 
 
 @app.route('/')
@@ -300,10 +326,6 @@ def compare_faces():
 
         # Trả về kết quả các khuôn mặt khớp được tìm thấy cùng danh sách sinh viên đã điểm danh
         return jsonify({'match': True, 'matched_faces': matched_faces, 'attended_students': attended_students})
-
-    except Exception as e:
-        traceback.print_exc()
-        return jsonify({'error': str(e)})
 
     except Exception as e:
         traceback.print_exc()
