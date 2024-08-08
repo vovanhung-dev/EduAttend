@@ -83,7 +83,7 @@ const userController = {
     updateUser: async (req, res) => {
         try {
             const userId = req.params.id;
-            const { username, email, password, role, phone, status, full_name, class: userClass, student_id } = req.body;
+            const { username, email, password, role, phone, status, full_name, class: userClass, student_id, image } = req.body;
     
             const [checkEmailExist] = await db.execute('SELECT * FROM users WHERE email = ? AND id != ?', [email, userId]);
     
@@ -132,6 +132,10 @@ const userController = {
                 updateFields.push('student_id = ?');
                 updateValues.push(student_id);
             }
+            if (image) {
+                updateFields.push('image = ?');
+                updateValues.push(image);
+            }
     
             if (updateFields.length === 0) {
                 return res.status(400).json({ message: 'No fields to update' });
@@ -152,6 +156,7 @@ const userController = {
             res.status(500).json(err);
         }
     },
+    
     
 
     logout: async (req, res) => {

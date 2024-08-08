@@ -1,11 +1,12 @@
-import { CheckCircleOutlined, CopyOutlined, HomeOutlined, PlusOutlined, StopOutlined, UserOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, CopyOutlined, HomeOutlined, PlusOutlined, StopOutlined, UserOutlined, UploadOutlined, CameraOutlined } from '@ant-design/icons';
 import { PageHeader } from '@ant-design/pro-layout';
-import { BackTop, Breadcrumb, Button, Modal, Form, Card, Col, Input, Popconfirm, Row, Space, Spin, Table, Tag, notification, message, Select } from 'antd';
+import { BackTop, Breadcrumb, Button, Modal, Form, Card, Col, Input, Popconfirm, Row, Space, Spin, Table, Tag, notification, message, Select, Upload, Radio } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import userApi from "../../apis/userApi";
 import "./accountManagement.css";
 import axiosClient from '../../apis/axiosClient';
+import AWS from 'aws-sdk';
 
 const { Option } = Select;
 
@@ -16,6 +17,7 @@ const AccountManagement = () => {
     const [page, setPage] = useState(1);
     const [selectedInput, setSelectedInput] = useState();
     const [form] = Form.useForm();
+    const [imageOption, setImageOption] = useState('upload');
 
     const history = useHistory();
 
@@ -37,6 +39,18 @@ const AccountManagement = () => {
             key: 'index',
             render: (value, item, index) => (
                 (page - 1) * 10 + (index + 1)
+            ),
+        },
+        {
+            title: 'Ảnh đại diện',
+            key: 'image',
+            dataIndex: 'image',
+            render: (image) => (
+                image ? (
+                    <img src={image} alt="User Avatar" style={{ width: 50, height: 50, borderRadius: '50%' }} />
+                ) : (
+                    <span>Không có ảnh</span>
+                )
             ),
         },
         {
@@ -120,7 +134,7 @@ const AccountManagement = () => {
             render: (text, record) => (
                 <div>
                     <Row style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                        {record.status !== "actived" ? 
+                        {record.status !== "actived" ?
                             <Popconfirm
                                 title="Bạn muốn mở chặn tài khoản này?"
                                 onConfirm={() => handleUnBanAccount(record)}
@@ -134,8 +148,8 @@ const AccountManagement = () => {
                                 >
                                     Mở chặn tài khoản
                                 </Button>
-                            </Popconfirm> 
-                            : 
+                            </Popconfirm>
+                            :
                             <Popconfirm
                                 title="Bạn muốn chặn tài khoản này?"
                                 onConfirm={() => handleBanAccount(record)}
@@ -151,18 +165,18 @@ const AccountManagement = () => {
                                 </Button>
                             </Popconfirm>
                         }
-                        <Button 
-                            size="small" 
-                            icon={<CheckCircleOutlined />} 
-                            style={{ width: 160, borderRadius: 15, height: 30, marginBottom: 6 }} 
+                        <Button
+                            size="small"
+                            icon={<CheckCircleOutlined />}
+                            style={{ width: 160, borderRadius: 15, height: 30, marginBottom: 6 }}
                             onClick={() => showChangeRoleModal(record)}
                         >
                             Thay đổi quyền
                         </Button>
-                        <Button 
-                            size="small" 
-                            icon={<UserOutlined />} 
-                            style={{ width: 160, borderRadius: 15, height: 30, marginBottom: 6 }} 
+                        <Button
+                            size="small"
+                            icon={<UserOutlined />}
+                            style={{ width: 160, borderRadius: 15, height: 30, marginBottom: 6 }}
                             onClick={() => showEditModal(record)}
                         >
                             Sửa
@@ -185,23 +199,52 @@ const AccountManagement = () => {
                 </div>
             ),
         }
-        
+
     ];
+
+    const s3 = new AWS.S3({
+        region: 'ap-southeast-2',
+        accessKeyId: 'AKIAZQ3DR2KZG7ZGRQHV',
+        secretAccessKey: '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',
+    });
+
+    const uploadToS3 = async (file, studentId, username) => {
+        const params = {
+            Bucket: 'zappa-60fsmljw6',
+            Key: `${studentId}_${username}`,
+            Body: file,
+            ContentType: file.type,
+        };
+
+        return s3.upload(params).promise();
+    };
 
     const [isEditModalVisible, setIsEditModalVisible] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [form2] = Form.useForm();
 
     const showEditModal = (record) => {
-        setSelectedUser(record);
-        form2.setFieldsValue(record);
+        const initialFormValues = {
+            ...record,
+            image: record.image ? [{ url: record.image }] : [],
+        };
+
+        console.log(initialFormValues)
+
+        setSelectedUser(initialFormValues);
+        form2.setFieldsValue(initialFormValues);
         setIsEditModalVisible(true);
     };
 
     const handleEditOk = async () => {
         try {
             const values = await form2.validateFields();
+            console.log(values)
             const updatedUser = { ...selectedUser, ...values };
+            if (values.image && values.image[0] && values.image[0].originFileObj) {
+                const uploadResult = await uploadToS3(values.image[0].originFileObj, values.student_id, values.username);
+                updatedUser.image = uploadResult.Location;
+            }
             await userApi.updateUser(updatedUser.id, updatedUser);
             notification["success"]({
                 message: `Thông báo`,
@@ -400,8 +443,15 @@ const AccountManagement = () => {
                 "password": values.password,
                 "role": values.role,
                 "student_id": values.student_id,
-                "status": "actived"
+                "status": "actived",
+                "image": ""
             }
+
+            if (values.image && values.image[0] && values.image[0].originFileObj) {
+                const uploadResult = await uploadToS3(values.image[0].originFileObj, values.student_id, values.name);
+                formatData.image = uploadResult.Location;
+            }
+
             await axiosClient.post("/user", formatData)
                 .then(response => {
                     console.log(response)
@@ -452,6 +502,54 @@ const AccountManagement = () => {
             setLoading(false);
         }, 1000);
     }
+
+    const handleCapture = async () => {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        video.play();
+
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+
+        // Set the dimensions of the canvas and video based on the modal width
+        const modalWidth = 500; // Width of the modal (adjust as needed)
+        const aspectRatio = 4 / 3; // Typical aspect ratio for webcam
+        const videoHeight = modalWidth / aspectRatio;
+
+        canvas.width = modalWidth;
+        canvas.height = videoHeight;
+
+        // Display modal with live video feed
+        Modal.confirm({
+            title: 'Chụp ảnh',
+            content: (
+                <video
+                    ref={(vid) => vid && (vid.srcObject = stream)}
+                    autoPlay
+                    style={{ width: '100%', height: 'auto' }} // Set video to fill modal width
+                />
+            ),
+            width: modalWidth, // Set modal width
+            onOk() {
+                // Capture the image from video feed
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob(async (blob) => {
+                    if (blob) {
+                        const file = new File([blob], 'captured-image.jpg', { type: 'image/jpeg' });
+                        form.setFieldsValue({
+                            image: [{ originFileObj: file }],
+                        });
+                    }
+                    stream.getTracks().forEach((track) => track.stop()); // Stop the camera
+                }, 'image/jpeg');
+            },
+            onCancel() {
+                stream.getTracks().forEach((track) => track.stop()); // Stop the camera
+            },
+        });
+    };
+
 
     const CancelCreateRecruitment = () => {
         setIsModalVisible(false);
@@ -671,6 +769,58 @@ const AccountManagement = () => {
                             <Input placeholder="Mã số sinh viên" />
                         </Form.Item>
 
+                        <Form.Item
+                            label="Chọn phương thức nhập ảnh"
+                            style={{ marginBottom: 10 }}
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng nhập chọn phương thức nhập ảnh!',
+                                },
+                            ]}
+                        >
+                            <Radio.Group
+                                value={imageOption}
+                                onChange={(e) => setImageOption(e.target.value)}
+                            >
+                                <Radio value="upload">Tải ảnh lên</Radio>
+                                <Radio value="capture">Chụp ảnh</Radio>
+                            </Radio.Group>
+                        </Form.Item>
+
+                        {imageOption === 'upload' && (
+                            <Form.Item
+                                name="image"
+                                label="Ảnh đại diện"
+                                valuePropName="fileList"
+                                getValueFromEvent={(e) => Array.isArray(e) ? e : e && e.fileList}
+                                style={{ marginBottom: 10 }}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Vui lòng nhập chọn ảnh đại diện!',
+                                    },
+                                ]}
+                            >
+                                <Upload name="image" listType="picture" maxCount={1}>
+                                    <Button icon={<UploadOutlined />}>Tải ảnh lên</Button>
+                                </Upload>
+                            </Form.Item>
+                        )}
+
+                        {imageOption === 'capture' && (
+                            <Form.Item
+                                label="Chụp ảnh"
+                                style={{ marginBottom: 10 }}
+                            >
+                                <Button
+                                    icon={<CameraOutlined />}
+                                    onClick={() => handleCapture(form.getFieldValue('student_id'), form.getFieldValue('name'))}
+                                >
+                                    Chụp ảnh
+                                </Button>
+                            </Form.Item>
+                        )}
 
                         <Form.Item >
                             <Button style={{ background: "#FF8000", color: '#FFFFFF', float: 'right', marginTop: 20, marginLeft: 8 }} htmlType="submit">
@@ -697,6 +847,7 @@ const AccountManagement = () => {
                         >
                             <Input />
                         </Form.Item>
+
                         <Form.Item
                             name="email"
                             label="Email"
@@ -704,6 +855,7 @@ const AccountManagement = () => {
                         >
                             <Input />
                         </Form.Item>
+
                         <Form.Item
                             name="phone"
                             label="Số điện thoại"
@@ -711,6 +863,7 @@ const AccountManagement = () => {
                         >
                             <Input />
                         </Form.Item>
+
                         <Form.Item
                             name="role"
                             label="Phân quyền"
@@ -722,6 +875,7 @@ const AccountManagement = () => {
                                 <Option value="isTeacher">Giảng viên</Option>
                             </Select>
                         </Form.Item>
+
                         <Form.Item
                             name="student_id"
                             label="Mã số người dùng"
@@ -729,6 +883,60 @@ const AccountManagement = () => {
                         >
                             <Input />
                         </Form.Item>
+
+                        <Form.Item
+                            label="Chọn phương thức nhập ảnh"
+                            style={{ marginBottom: 10 }}
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng nhập chọn phương thức nhập ảnh!',
+                                },
+                            ]}
+                        >
+                            <Radio.Group
+                                value={imageOption}
+                                onChange={(e) => setImageOption(e.target.value)}
+                            >
+                                <Radio value="upload">Tải ảnh lên</Radio>
+                                <Radio value="capture">Chụp ảnh</Radio>
+                            </Radio.Group>
+                        </Form.Item>
+
+                        {imageOption === 'upload' && (
+                            <Form.Item
+                                name="image"
+                                label="Ảnh đại diện"
+                                valuePropName="fileList"
+                                getValueFromEvent={(e) => Array.isArray(e) ? e : e && e.fileList}
+                                style={{ marginBottom: 10 }}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Vui lòng nhập chọn ảnh đại diện!',
+                                    },
+                                ]}
+                            >
+                                <Upload name="image" listType="picture" maxCount={1} >
+                                    <Button icon={<UploadOutlined />}>Tải ảnh lên</Button>
+                                </Upload>
+                            </Form.Item>
+                        )}
+
+                        {imageOption === 'capture' && (
+                            <Form.Item
+                                label="Chụp ảnh"
+                                style={{ marginBottom: 10 }}
+                            >
+                                <Button
+                                    icon={<CameraOutlined />}
+                                    onClick={() => handleCapture(form.getFieldValue('student_id'), form.getFieldValue('name'))}
+                                >
+                                    Chụp ảnh
+                                </Button>
+                            </Form.Item>
+                        )}
+
                     </Form>
                 </Modal>
 
