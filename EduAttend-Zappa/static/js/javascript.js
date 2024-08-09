@@ -189,12 +189,29 @@ function takeSnapshot() {
                 let resultElement = document.getElementById('result');
                 resultElement.innerHTML = '';
 
-                if (data.match && data.matched_faces.length > 0) {
-                    // Hiển thị thông báo đã điểm danh thành công
-                    let resultElement = document.getElementById('result');
-                    resultElement.innerHTML = '<p>Đã điểm danh thành công. Vui lòng chạy lại trang web để xem danh sách sinh viên đã điểm danh!</p>';
+                if (data.match) {
+                    if (data.attended_students.length > 0) {
+                        // Hiển thị thông báo đã điểm danh thành công
+                        data.attended_students.forEach(student => {
+                            let studentElement = document.createElement('p');
+                            studentElement.innerText = `Sinh viên ${student.hoten} (${student.student_id}) đã được điểm danh.`;
+                            studentElement.classList.add('text-xl', 'text-white', 'p-2');
+                            resultElement.appendChild(studentElement);
+                        });
+                
+                        let successMessage = document.createElement('p');
+                        successMessage.innerText = 'Đã điểm danh thành công. Vui lòng chạy lại trang web để xem danh sách sinh viên đã điểm danh!';
+                        successMessage.classList.add('text-xl', 'text-white', 'p-8');
+                        resultElement.appendChild(successMessage);
+                    } else {
+                        // Nếu attended_students rỗng
+                        let noStudentsElement = document.createElement('p');
+                        noStudentsElement.innerText = 'Không có sinh viên nào được điểm danh!';
+                        noStudentsElement.classList.add('text-xl', 'text-white', 'p-8');
+                        resultElement.appendChild(noStudentsElement);
+                    }
                 } else {
-                    // No matching result found
+                    // Nếu không tìm thấy kết quả nào
                     let noResultElement = document.createElement('div');
                     noResultElement.innerText = 'Không tìm thấy kết quả nào';
                     noResultElement.classList.add('text-xl', 'text-white', 'p-8');
