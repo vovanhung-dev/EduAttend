@@ -266,11 +266,19 @@ const AccountManagement = () => {
 
     const handleDeleteAccount = async (record) => {
         try {
-            await userApi.deleteUser(record.id);
-            notification["success"]({
-                message: `Thông báo`,
-                description: 'Xóa tài khoản thành công',
-            });
+            const res = await userApi.deleteUser(record.id);
+            if(res === "Cannot delete user, as they are referenced in other records"){
+                notification["error"]({
+                    message: `Thông báo`,
+                    description: 'Không thể xóa tài khoản, vì đang liên kết với bảng khác!',
+                });
+            }else{
+
+                notification["success"]({
+                    message: `Thông báo`,
+                    description: 'Xóa tài khoản thành công',
+                });
+            }
             handleListUser();
         } catch (error) {
             notification["error"]({

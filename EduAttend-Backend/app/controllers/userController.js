@@ -64,21 +64,24 @@ const userController = {
     deleteUser: async (req, res) => {
         try {
             const userId = req.params.id;
-
+    
             const [checkUserExist] = await db.execute('SELECT * FROM users WHERE id = ?', [userId]);
-
+    
             if (checkUserExist.length === 0) {
                 return res.status(404).json("User not found");
             }
-
+    
             const deleteQuery = 'DELETE FROM users WHERE id = ?';
             await db.execute(deleteQuery, [userId]);
-
+    
             res.status(200).json("Delete success");
         } catch (err) {
+            if (err.code === 'ER_ROW_IS_REFERENCED_2') {
+                return res.status(200).json("Cannot delete user, as they are referenced in other records");
+            }
             res.status(500).json(err);
         }
-    },
+    },    
 
     updateUser: async (req, res) => {
         try {
