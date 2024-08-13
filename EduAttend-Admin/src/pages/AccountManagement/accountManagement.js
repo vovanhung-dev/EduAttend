@@ -211,7 +211,7 @@ const AccountManagement = () => {
     const uploadToS3 = async (file, studentId, username) => {
         const params = {
             Bucket: 'zappa-60fsmljw6',
-            Key: `${studentId}_${username}`,
+            Key: `${studentId}-${username}`,
             Body: file,
             ContentType: file.type,
         };

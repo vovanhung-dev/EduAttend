@@ -90,6 +90,13 @@ const ScheduleList = lazy(() => {
         .then(([moduleExports]) => moduleExports);
 });
 
+const ImageS3 = lazy(() => {
+    return Promise.all([
+        import('../pages/MultiImageUpload/MultiImageUpload'),
+        new Promise(resolve => setTimeout(resolve, 0))
+    ])
+        .then(([moduleExports]) => moduleExports);
+});
 
 const RouterURL = withRouter(({ location }) => {
 
@@ -157,6 +164,12 @@ const RouterURL = withRouter(({ location }) => {
                                 <ScheduleList />
                             </Suspense>
                         </PrivateRoute>
+
+                        <PrivateRoute exact path="/image-s3">
+                            <Suspense fallback={<LoadingScreen />}>
+                                <ImageS3 />
+                            </Suspense>
+                        </PrivateRoute>
                         
                         
                         <PrivateRoute exact path="/notfound">
@@ -214,6 +227,10 @@ const RouterURL = withRouter(({ location }) => {
                     </Route>
 
                     <Route exact path="/schedule-list">
+                        <DefaultContainer />
+                    </Route>
+
+                    <Route exact path="/image-s3">
                         <DefaultContainer />
                     </Route>
 

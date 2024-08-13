@@ -31,6 +31,12 @@ function Sidebar() {
       link: "/schedule-list",
       icon: <SolutionOutlined />
     },
+    {
+      key: "image-s3",
+      title: "Tải ảnh lên S3",
+      link: "/image-s3",
+      icon: <ContainerOutlined />
+    },
   ];
 
   const menuSidebarPartner = [
