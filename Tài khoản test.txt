@@ -1,0 +1,7 @@
+Tài khoản test:
+Admin:
+admin@gmail.com
+123456
+Giảng viên:
+tranvanhung@gmail.com
+123456
