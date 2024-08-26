@@ -71,7 +71,7 @@ function Topbar() {
               >
                 <Col style={{ paddingLeft: 10 }}>
                   <a href="#">
-                    <img style={{ height: 60 }} className="logo" alt="" src="https://www.stu.edu.vn/images/logo1.png" />
+                    <img style={{ height: 60, objectFit: 'contain' }} className="logo" alt="" src="https://upload.wikimedia.org/wikipedia/vi/thumb/b/bf/Logo_HUET.svg/640px-Logo_HUET.svg.png" />
                   </a>
                 </Col>
               </Row>
