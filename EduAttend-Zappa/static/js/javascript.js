@@ -63,7 +63,7 @@ function uploadImage() {
                             studentElement.classList.add('text-xl', 'text-white', 'p-2');
                             resultElement.appendChild(studentElement);
                         });
-                
+
                         let successMessage = document.createElement('p');
                         successMessage.innerText = 'Đã điểm danh thành công. Vui lòng chạy lại trang web để xem danh sách sinh viên đã điểm danh!';
                         successMessage.classList.add('text-xl', 'text-white', 'p-8');
@@ -82,7 +82,7 @@ function uploadImage() {
                     noResultElement.classList.add('text-xl', 'text-white', 'p-8');
                     resultElement.appendChild(noResultElement);
                 }
-                
+
 
                 // Ẩn loading sau khi nhận kết quả
                 loading.style.display = 'none';
@@ -198,7 +198,7 @@ function takeSnapshot() {
                             studentElement.classList.add('text-xl', 'text-white', 'p-2');
                             resultElement.appendChild(studentElement);
                         });
-                
+
                         let successMessage = document.createElement('p');
                         successMessage.innerText = 'Đã điểm danh thành công. Vui lòng chạy lại trang web để xem danh sách sinh viên đã điểm danh!';
                         successMessage.classList.add('text-xl', 'text-white', 'p-8');
@@ -282,17 +282,44 @@ function getSelectedSchedule() {
 
                 // Construct HTML to display schedule details
                 let html = `
-                    <p class="text-white text-lg pt-10">Môn học: ${data.lich_thi.mon_hoc}</p>
-                    <p class="text-white">Ngày thi: ${new Date(data.lich_thi.ngay).toLocaleDateString('vi-VN')}</p>
-                    <p class="text-white">Phòng thi: ${data.lich_thi.phong}</p>
-                    <p class="text-white">Giám thị:
-                    <ul class="text-white">
+                 <div class="overflow-x-auto py-5">
+    <table class="w-full max-w-md bg-white border border-gray-200 rounded-lg shadow-lg mx-auto">
+        <thead>
+           <tr>
+                <th class="py-4 px-6 bg-blue-500 text-white text-center align-middle text-lg font-semibold">Thông tin</th>
+                <th class="py-4 px-6 bg-blue-500 text-white text-center align-middle text-lg font-semibold">Chi tiết</th>
+            </tr>
+        </thead>
+        <tbody class="text-gray-700">
+            <tr class="border-t">
+                <td class="py-4 px-6">📚 Môn học</td>
+                <td class="py-4 px-6">${data.lich_thi.mon_hoc}</td>
+            </tr>
+            <tr class="border-t">
+                <td class="py-4 px-6">🗓️ Ngày thi</td>
+                <td class="py-4 px-6">${new Date(data.lich_thi.ngay).toLocaleDateString('vi-VN')}</td>
+            </tr>
+            <tr class="border-t">
+                <td class="py-4 px-6">🏫 Phòng thi</td>
+                <td class="py-4 px-6">${data.lich_thi.phong}</td>
+            </tr>
+            <tr class="border-t">
+                <td class="py-4 px-6">👨‍🏫 Giám thị</td>
+                <td class="py-4 px-6">
+                    <ol class="list-inside">
                         ${data.lich_thi.giam_thi_1 ? `<li>${data.lich_thi.giam_thi_1}</li>` : ''}
                         ${data.lich_thi.giam_thi_2 ? `<li>${data.lich_thi.giam_thi_2}</li>` : ''}
                         ${data.lich_thi.giam_thi_3 ? `<li>${data.lich_thi.giam_thi_3}</li>` : ''}
                         ${data.lich_thi.giam_thi_4 ? `<li>${data.lich_thi.giam_thi_4}</li>` : ''}
-                    </ul>
-                </p>
+                    </ol>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+
                 
                     <p class="text-white">Danh sách thí sinh:</p>
                     <div class="overflow-x-auto">
@@ -377,13 +404,13 @@ function updateAttendanceStatus(examId, userId) {
             new_status: newStatus
         })
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Trạng thái điểm danh đã được cập nhật');
-        } else {
-            alert('Có lỗi xảy ra khi cập nhật trạng thái điểm danh');
-        }
-    })
-    .catch(error => console.error('Error updating attendance status:', error));
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Trạng thái điểm danh đã được cập nhật');
+            } else {
+                alert('Có lỗi xảy ra khi cập nhật trạng thái điểm danh');
+            }
+        })
+        .catch(error => console.error('Error updating attendance status:', error));
 }
