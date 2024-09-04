@@ -170,10 +170,10 @@ const userController = {
         const email = req.query.email;
     
         try {
-            const query = 'SELECT * FROM users WHERE email LIKE ?';
+            const query = 'SELECT * FROM users WHERE email LIKE ? OR student_id = ?';
             const searchTerm = `%${email}%`;
     
-            const [userList] = await db.execute(query, [searchTerm]);
+            const [userList] = await db.execute(query, [searchTerm, email]);
             res.status(200).json({ data: userList });
         } catch (err) {
             res.status(500).json({ message: err.message });
