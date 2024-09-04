@@ -622,7 +622,7 @@ const AccountManagement = () => {
                             <Row>
                                 <Col span="12">
                                     <Input
-                                        placeholder="Tìm kiếm theo email"
+                                        placeholder="Tìm kiếm"
                                         allowClear
                                         style={{ width: 300 }}
                                         onChange={handleFilterEmail}
