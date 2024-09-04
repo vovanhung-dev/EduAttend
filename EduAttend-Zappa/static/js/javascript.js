@@ -274,7 +274,7 @@ fetch('/lich_thi')
 function showLoading() {
     document.getElementById('loading').classList.remove('hidden');
     document.getElementById('loading-text').classList.remove('hidden');
-    document.getElementById('loading-text').innerText = 'Đang tải...';
+    document.getElementById('loading-text').innerText = '';
 }
 
 // Function to hide result
