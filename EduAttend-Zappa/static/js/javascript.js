@@ -17,6 +17,8 @@ function displayImageFromCanvas(canvas) {
 }
 
 function uploadImage() {
+    hideResult();
+
     var form = document.getElementById('uploadForm');
     var formData = new FormData(form);
 
@@ -30,7 +32,7 @@ function uploadImage() {
         var base64Image = reader.result.split(',')[1];
         formData.append('imageBase64', base64Image);
 
-        displayImageFromFile(file);
+        // displayImageFromFile(file);
 
         var maLichThi = document.getElementById('examSchedule').value;
 
@@ -107,6 +109,7 @@ function uploadImage() {
 let videoStream = null;
 
 function startCamera() {
+    hideResult();
     const photoContainer = document.getElementById('photo-container');
     photoContainer.innerHTML = ''; // Xóa nội dung hiện có của photoContainer
 
@@ -148,6 +151,7 @@ function startCamera() {
 
 
 function takeSnapshot() {
+    hideResult();
     const video = document.getElementById('camera');
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
@@ -241,11 +245,13 @@ function dataURItoBlob(dataURI) {
 }
 
 function showUploadOption() {
+    hideResult();
     document.getElementById('upload-file-section').classList.remove('hidden');
     document.getElementById('camera-section').classList.add('hidden');
 }
 
 function showCameraOption() {
+    hideResult();
     document.getElementById('upload-file-section').classList.add('hidden');
     document.getElementById('camera-section').classList.remove('hidden');
 }
@@ -269,6 +275,11 @@ function showLoading() {
     document.getElementById('loading').classList.remove('hidden');
     document.getElementById('loading-text').classList.remove('hidden');
     document.getElementById('loading-text').innerText = 'Đang tải...';
+}
+
+// Function to hide result
+function hideResult() {
+    document.getElementById('result').innerHTML = '';
 }
 
 function getSelectedSchedule() {
@@ -317,9 +328,6 @@ function getSelectedSchedule() {
         </tbody>
     </table>
 </div>
-
-
-
                 
                     <p class="text-white">Danh sách thí sinh:</p>
                     <div class="overflow-x-auto">
