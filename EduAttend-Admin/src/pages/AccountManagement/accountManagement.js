@@ -639,11 +639,11 @@ const AccountManagement = () => {
                         </PageHeader>
                     </div>
                 </div>
-                <div style={{ marginTop: 20, marginRight: 5 }}>
+                <div style={{ marginTop: 20, marginRight: 5, overflowX: 'auto' }}>
                     <div id="account">
                         <div id="account_container">
                             <Card title="Quản lý tài khoản" bordered={false} >
-                                <Table columns={columns} dataSource={user} pagination={{ position: ['bottomCenter'] }}
+                                <Table columns={columns} dataSource={user} pagination={{ position: ['bottomCenter'] }} scroll={{ x: true }}
                                 />
                             </Card>
                         </div>
